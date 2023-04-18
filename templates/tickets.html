@@ -1,0 +1,104 @@
+{% extends "base-admin.html" %}
+
+{% block container %}
+
+  <!-- Content -->
+  <div class="layout-content" data-scrollable>
+    <div class="container-fluid">
+
+      <ol class="breadcrumb">
+        <li><a href="{{url_for('dashboard')}}">Главная</a></li>
+        <li class="active">Служба поддержки</li>
+      </ol>
+      <div class="row m-b-1">
+        {% if user.role == 0 %}
+        <div class="col-md-6">
+          <div class="card card-stats-primary">
+            <div class="card-block">
+              <div class="media">
+                <div class="media-left media-middle">
+                  <i class="material-icons text-primary md-36">query_builder</i>
+                </div>
+                <div class="media-body media-middle">
+                  <h4 class="card-title m-b-0">
+                    <strong class="text-primary">{{open_tickets}}</strong> Открытые заявки
+                  </h4>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card card-stats-success">
+            <div class="card-block">
+              <div class="media">
+                <div class="media-left media-middle">
+                  <i class="material-icons text-success md-36">done_all</i>
+                </div>
+                <div class="media-body media-middle">
+                  <h4 class="card-title m-b-0">
+                    <strong class="text-success">{{closed_tickets}}</strong> Закрытые заявки
+                  </h4>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+      <div class="row">
+        <div class="col-md-6">
+          <h3>Последние заявки <a href="{{url_for('add_ticket')}}" class="btn btn-primary btn-rounded-deep m-l-1">Создать <i class="material-icons">add</i></a></h3>
+        </div>
+
+
+      </div>
+
+      <div class="card">
+        <ul class="list-group list-group-fit">
+          {% for ticket in tickets|sort(attribute="last_update", reverse=True) %}
+          {%set last_msg = ticket.messages|sort(attribute="date")%}
+          <li class="list-group-item">
+            <div class="media">
+              <div class="media-body media-middle">
+                <h4 class="card-title m-b-0"><a href="{{url_for('view_ticket', ticket_id=ticket.id)}}">{{ticket.subject}}</a> {%if (last_msg|last).unread %}<span class="label label-pill label-primary">Новое сообщение</span>{% endif %}</h4>
+                <small><span class="text-muted">последнее сообщение </span>{{ticket.last_update.strftime('%d-%m-%Y %H:%M')}}
+
+
+
+                  <span class="text-muted">от</span> {{(last_msg|last).sender.username.capitalize()}}</small>
+
+              </div>
+              <div class="media-right media-middle right">
+                <div style="width:150px">
+                       {% if ticket.status == 0 %}
+                  <span class="label label-pill label-success">
+                        {% endif %}
+                        {% if ticket.status == 1 %}
+                  <span class="label label-pill label-default">
+                        {% endif %}
+                        {% if ticket.status == 2 %}
+                  <span class="label label-pill label-warning">
+                        {% endif %}
+                        {% if ticket.status == 3 %}
+                  <span class="label label-pill label-primary">
+                        {% endif %}
+                                                          {{status.get(ticket.status)}}</span>
+
+
+
+                </div>
+
+              </div>
+            </div>
+          </li>
+          {% endfor %}
+
+
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+{% endblock %}

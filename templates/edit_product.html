@@ -1,0 +1,282 @@
+{% extends "base-admin.html" %}
+
+{% block container %}
+      <!-- Breadcrumb -->
+      <ol class="breadcrumb">
+        <li><a href="{{ url_for('dashboard')}}">Главная</a></li>
+        <li><a href="{{ url_for('product')}}">Продукты</a></li>
+        <li class="active">Редактирование продукта</li>
+      </ol>
+
+        <div class="jumbotron">
+            <p class="lead">Заполните информацию о продукте, об авторе, загрузите главное изображение и аватар автора, установите цену.</p>
+        </div>
+
+
+    <form action="{{url_for('edit_product', product_id=product.id, command='edit')}}" method="POST" enctype=multipart/form-data>
+
+      <div class="row">
+        <div class="col-md-6">
+
+            <div class="card">
+                <div class="card-block">
+                   <button type="submit" class="btn btn-success btn-rounded">Сохранить</button> <a href="{{url_for('product')}}" class="btn btn-white btn-rounded">Выйти</a>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-block">
+                    <fieldset class="form-group">
+                      {{ form.only_button.label }}
+                      {{ form.only_button (class="form-control", disabled=True)}}
+                        <small class="text-help">Если у вас есть свой сайт, и вы хотите встроить на него кнопку "Купить на ИНКВИК" - то выберите <strong>Да</strong> для получения кода кнопки</small>
+                    </fieldset>
+                </div>
+            </div>
+
+            <div class="card">
+               <div class="card-block">
+                <h5>Общая информация</h5>
+                <label class="form-control-label">Ссылка на продукт</label>
+                <fieldset class="form-group row">
+                    <div class="col-sm-3">
+                        {{ form.link (class="form-control", style="text-align:right;", placeholder="")}}
+                    </div>
+                        {{ form.link.label (class="h4 col-sm-9")}}
+                         {% if form.link.errors %}
+                        {% for msg in form.link.errors %}
+                         <small class="text-danger">{{msg}}</small>
+                        {% endfor %}
+                        {% endif %}
+
+                </fieldset>
+                <small class="text-help">Это адрес в интернете, по которому покупатель сможет найти страницу вашего продукта. Он может состоять из латинских букв и цифр</small>
+                <fieldset class="form-group">
+                    {{ form.content_type.label }}
+                    {{ form.content_type (class="form-control", list="typesOptions", placeholder="Укажите тип продукта")}}
+                    <datalist id="typesOptions">
+                        {% for type_name in form.content_types %}
+                            <option value="{{type_name}}">{{type_name}}</option>
+                        {% endfor %}
+                    </datalist>
+                    {% if form.content_type.errors %}
+                    {% for msg in form.content_type.errors %}
+                     <small class="text-danger">{{msg}}</small>
+                    {% endfor %}
+                    {% endif %}
+                  <small class="text-help">Что больше подходит для вашего проекта? Курс/марафон/мастер-класс и т.д.</small>
+                </fieldset>
+
+                <fieldset class="form-group ">
+                    {{ form.name.label }}
+                    {{ form.name (class="form-control",  placeholder="Коммерческое название")}}
+                    {% if form.name.errors %}
+                    {% for msg in form.name.errors %}
+                     <small class="text-danger">{{msg}}</small>
+                    {% endfor %}
+                    {% endif %}
+                    <small class="text-help">Это название будет показываться покупателю</small>
+                </fieldset>
+               </div>
+            </div>
+
+            <div class="card">
+               <div class="card-block">
+                   <h5>О продукте</h5>
+                  <fieldset class="form-group">
+                      {{ form.short_description.label }}
+                      {{ form.short_description (class="form-control", rows='2')}}
+                                      {% if form.short_description.errors %}
+                    {% for msg in form.short_description.errors %}
+                     <small class="text-danger">{{msg}}</small>
+                    {% endfor %}
+                    {% endif %}
+                      <small class="text-help">Подзаголовок, коротко опишите, почему ваш продукт нужен клиенту</small>
+                  </fieldset>
+
+                   <fieldset class="form-group">
+                      {{ form.description.label }}
+                      {{ form.description (class="form-control", rows="3")}}
+                       {% if form.description.errors %}
+                        {% for msg in form.description.errors %}
+                         <small class="text-danger">{{msg}}</small>
+                        {% endfor %}
+                        {% endif %}
+                      <small class="text-help">Описание продукта</small>
+                    </fieldset>
+
+                   <fieldset class="form-group">
+                      {{ form.main_result.label }}
+                      {{ form.main_result (class="form-control")}}
+                                      {% if form.main_result.errors %}
+                    {% for msg in form.main_result.errors %}
+                     <small class="text-danger">{{msg}}</small>
+                    {% endfor %}
+                    {% endif %}
+                      <small class="text-help">В трех-четырех коротких тезисах сформулируйте, какие навыки приобретет покупатель вашего продукта </small>
+                    </fieldset>
+
+                    <fieldset class="form-group ">
+                        {{ form.main_img.label }}
+                        {% if product %}
+                            {% if product.main_img %}
+                                <div class="row center">
+                                        <img class='center' src="{{url_for('uploaded_file',landing_folder=product.link,filename=product.main_img)}}" style="max-width: 100%;" alt="">
+                                </div>
+                                <a href='{{url_for("delete_image", product_id=product.id, image=product.main_img)}}'><p  class="small center text-danger">х Удалить</p></a>
+                            {% else %}
+                                <p class="small text-warning center">Обложка не загружена</p>
+                            {% endif%}
+                        {% endif %}
+
+                        {{ form.main_img (class="form-control", onchange="javascript:this.form.submit();")}}
+                        {% if form.main_img.errors %}
+                            {% for msg in form.main_img.errors %}
+                                <small class="text-danger">{{msg}}</small>
+                            {% endfor %}
+                        {% endif %}
+                        <small class="text-help">Баннер продукта отображается на странице продукта</small>
+                    </fieldset>
+               </div>
+            </div>
+
+            <div class="card">
+               <div class="card-block">
+                   <h5>Цена</h5>
+                  <fieldset class="form-group">
+                      {{ form.price.label }}
+                      {{ form.price (class="form-control", placeholder="199")}}
+                      {% if form.price.errors %}
+                            {% for msg in form.price.errors %}
+                             <small class="text-danger">{{msg}}</small>
+                            {% endfor %}
+                      {% endif %}
+                  <small class="text-help">Базовая цена, по которой продается продукт без промокода</small>
+                  </fieldset>
+
+                  <fieldset class="form-group">
+                      {{ form.promoprice.label }}
+                      {{ form.promoprice (class="form-control", placeholder="99")}}
+                      {% if form.promoprice.errors %}
+                        {% for msg in form.promoprice.errors %}
+                         <small class="text-danger">{{msg}}</small>
+                        {% endfor %}
+                      {% endif %}
+                      <small class="text-help">Цена по промокоду</small>
+                  </fieldset>
+               </div>
+            </div>
+
+            <div class="card">
+               <div class="card-block">
+                   <h5>Об авторе</h5>
+                   <small class="mb-3">Вы можете не заполнять данный раздел, в таком случае соотвествующий блок будет скрыт со страницы продукта</small>
+                   <hr>
+
+                   <fieldset class="form-group">
+                      {{ form.commercial_name.label }}
+                      {{ form.commercial_name (class="form-control")}}
+                      {% if form.commercial_name.errors %}
+                            {% for msg in form.commercial_name.errors %}
+                             <small class="text-danger">{{msg}}</small>
+                            {% endfor %}
+                      {% endif %}
+                      <small class="text-help">Имя автора, которое будет указано на странице</small>
+                   </fieldset>
+
+                   <fieldset class="form-group">
+                      {{ form.about_info.label }}
+                      {{ form.about_info (class="form-control")}}
+                       {% if form.about_info.errors %}
+                        {% for msg in form.about_info.errors %}
+                         <small class="text-danger">{{msg}}</small>
+                        {% endfor %}
+                       {% endif %}
+                        <small class="text-help">Расскажите немного об авторе, для того, чтобы у покупателя было больше уверенности в его экспертности</small>
+                   </fieldset>
+
+                   <fieldset class="form-group ">
+                    {{ form.author_avatar.label }}
+                    {% if product %}
+                            {% if product.author_avatar %}
+                               <article class="item">
+                                    <div class="photo">
+                                        <img class="personPhoto"  src="{{url_for('uploaded_file',landing_folder=product.link,filename=product.author_avatar)}}" alt="">
+                                    </div>
+                                </article>
+                                 <a href='{{url_for("delete_image", product_id=product.id, image=product.author_avatar)}}'><p  class="small center text-danger">х Удалить</p></a>
+                            {% else %}
+                                <p class="small text-warning center">Аватар не загружен</p>
+                            {% endif%}
+                    {% endif %}
+
+                    {{ form.author_avatar (class="form-control", onchange="javascript:this.form.submit();")}}
+                    {% if form.author_avatar.errors %}
+                        {% for msg in form.author_avatar.errors %}
+                            <small class="text-danger">{{msg}}</small>
+                        {% endfor %}
+                    {% endif %}
+                  <small class="text-help">Аватар автора отображается в разделе "Об авторе"</small>
+                </fieldset>
+               </div>
+            </div>
+
+            {% if user.role <= 1 %}
+                <div class="card">
+                   <div class="card-block">
+                        <fieldset class="form-group">
+                            <label for="author" class="form-label">Назначить автора</label>
+                            {{form.author(class="form-control", list="datalistOptions",placeholder="Начните вводить имя пользователя/почту/промокод")}}
+                            <datalist id="datalistOptions">
+                                    {% for name,promocode in users_datalist.items() %}
+                                        <option value="{{name}}">{{promocode}}</option>
+                                    {% endfor %}
+                            </datalist>
+                            <small class="text-help">Указанный пользователь будет иметь права доступа автора к данному проекту</small>
+                        </fieldset>
+                   </div>
+                </div>
+            {% else %}
+                   {{form.author(type='hidden')}}
+            {% endif %}
+            {{ form.csrf_token }}
+            <div class="card" hidden>
+                <div class="card-block">
+                 <fieldset class="form-group">
+                      {{ form.thankyoutext.label }}
+                      {{ form.thankyoutext (class="form-control", rows="3")}}
+                      <small class="text-help">Сообщение с этим текстом мы направим покупателю в письме и отобразим на странице с уведомлением об успешной продаже</small>
+                </fieldset>
+                </div>
+            </div>
+
+            <div class="card">
+               <div class="card-block">
+                   <button type="submit" class="btn btn-success btn-rounded">Сохранить</button> <a href="{{url_for('product')}}" class="btn btn-white btn-rounded">Отмена</a>
+
+               </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card">
+               <div class="card-block">
+                        Помощь
+                        <hr>
+                        Ниже представлена структура страницы, посмотрите где расположены соответствующие блоки и заполните информацию о своем продукте
+                           <img id="help-img" src="{{url_for('static',filename='help/preview.png')}}" style="width: 100%;">
+                        <hr>
+                        Изменения будут сохранены при нажатии на кнопку <strong>"Сохранить"</strong> либо автоматически при изменении любого из изображений продукта.
+                        <br>
+                        После того, как вы заполните информацию о продукте, установите цену и загрузите материалы, к которым нужно предоставить доступ покупателю - мы проверим продукт и сразу после проверки он будет опубликован.
+                        <br>
+                        Напишите нам в <a href="https://t.me/inquicksupportbot">Telegram</a>, либо <a href="{{url_for('add_ticket')}}">создайте</a> обращение в личном кабинете, если у Вас возникнут сложности с добавлением или редактированием своего продукта.
+               </div>
+          </div>
+        </div>
+
+      </div>
+
+    </form>
+
+{% endblock %}
+

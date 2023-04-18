@@ -1,0 +1,61 @@
+{% extends "base-admin.html" %}
+
+{% block container %}
+      <!-- Breadcrumb -->
+      <ol class="breadcrumb">
+        <li><a href="{{ url_for('dashboard')}}">Главная</a></li>
+        <li><a href="{{ url_for('tickets')}}">Поддержка</a></li>
+          <li>Новое обращение</li>
+      </ol>
+
+<form action="{{url_for('add_ticket')}}" method="POST">
+      <div class="row">
+
+        <div class="col">
+          <div class="card">
+               <div class="card-block">
+              <h5>Создание обращения</h5>
+
+                <fieldset class="form-group ">
+
+                    {{ form.subject.label }}
+                    {{ form.subject (class="form-control")}}
+                                    {% if form.subject.errors %}
+                    {% for msg in form.subject.errors %}
+                     <small class="text-danger">{{msg}}</small>
+                    {% endfor %}
+                    {% endif %}
+                </fieldset>
+                  <fieldset class="form-group">
+                      {{ form.message.label }}
+                      {{ form.message (class="form-control", rows="3")}}
+                                      {% if form.message.errors %}
+                    {% for msg in form.mesage.errors %}
+                     <small class="text-danger">{{msg}}</small>
+                    {% endfor %}
+                    {% endif %}
+                </fieldset>
+
+
+              <hr>
+
+                   {{ form.csrf_token }}
+       <button type="submit" class="btn btn-success btn-rounded">Создать обращение</button> <a href="{{url_for('tickets')}}" class="btn btn-white btn-rounded">Отмена</a>
+
+
+
+
+            </div>
+          </div>
+
+        </div>
+
+
+
+               </div>
+
+
+</form>
+
+{% endblock %}
+

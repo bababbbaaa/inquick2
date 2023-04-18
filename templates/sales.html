@@ -1,0 +1,148 @@
+{% extends "base-admin.html" %}
+
+{% block container %}
+
+      <!-- Breadcrumb -->
+
+      <ol class="breadcrumb">
+        <li><a href="{{ url_for('dashboard')}}">Главная</a></li>
+        <li><a href="#">Продажи</a></li>
+      </ol>
+<div class="clearfix"></div>
+
+       <div class="card">
+            <div class="card-header"><h5 class="card-title">Фильтр</h5></div>
+              <div class="row">
+                    <form action="{{url_for('sales')}}" method="POST">
+       <div class="col-md-6">
+                <div class="card-block">
+
+                    <fieldset class="form-group">
+                          {{form.buyer.label }}
+     {{form.buyer(class="form-control")}}
+                          </fieldset>
+                    <fieldset class="form-group ">
+                            {{ form.date_from.label}} от
+                                {{ form.date_from() }} до
+                        {{ form.date_to() }}
+
+</fieldset>
+
+
+            {{form.is_paid.label }}
+                      {{form.is_paid (class="form-control")}}
+
+                </div>
+       </div>
+                  <div class="col-md-6">
+                      <div class="card-block">
+
+                                <fieldset class="form-group">
+     {{form.ref.label }}
+     {{form.ref(class="form-control", list="reflist",placeholder="Начните вводить имя пользователя/промокод")}}
+<datalist id="reflist">
+{% for u in users_list %}
+    <option value="{{u.username}}">{{u.promocode}}</option>
+{% endfor %}
+</datalist>
+
+      </fieldset>
+
+                           <fieldset class="form-group">
+     {{form.author.label }}
+     {{form.author(class="form-control", list="authorlist",placeholder="Начните вводить имя пользователя/промокод")}}
+<datalist id="authorlist">
+{% for u in users_list %}
+    <option value="{{u.username}}">{{u.promocode}}</option>
+{% endfor %}
+
+</datalist>
+
+      </fieldset>
+                          <fieldset class="form-group">
+     {{form.product_name.label }}
+     {{form.product_name(class="form-control", list="productlist",placeholder="Начните вводить название продукта/ссылку")}}
+<datalist id="productlist">
+
+{% for product in user.products %}
+    <option value="{{product.name}}">{{product.link}}</option>
+{% endfor %}
+    {{form.csrf_token }}
+</datalist>
+
+      </fieldset>
+                           <button type="submit" class="btn btn-primary btn-rounded">Применить</button> <a href="{{url_for('sales')}}" class="btn btn-white btn-rounded">Сбросить</a>
+
+                      </div>
+                  </div>
+                    </form>
+              </div>
+       </div>
+
+       <div class="card">
+        <div class="card-header">
+          <h5 class="card-title">Продажи</h5>
+        </div>
+           <div class="card-block">
+               <div class="table-box">
+        <table id="sales" class="table table-striped table-hover table-sm">
+          <thead style="cursor: pointer;">
+            <tr>
+                <th><a href="{{ url_for('sales', date_to=form.date_to.raw_data[0], date_from=form.date_from.raw_data[0], mail=form.buyer.data, author=form.author.data, ref=form.ref.data, product_name=form.product_name.data, is_paid=form.is_paid.data, id_desc=toggle_id_sort) }}">ID<span class="material-icons">{% if toggle_id_sort==1 %}arrow_drop_down{% else %}arrow_drop_up{% endif %}</span></a></th>
+              <th id="date_sort">Дата<span class="material-icons">{% if toggle_date_sort %}arrow_drop_down{% else %}arrow_drop_up{% endif %}</span></th>
+              <th>Продукт</th>
+
+              <th id="author_sort">Автор</th>
+              <th id="client_sort">Покупатель</th>
+              <th>Цена</th>
+              <th>Оплата</th>
+                 <th>Реф</th>
+            </tr>
+          </thead>
+            {% for order in orders.items %}
+            <tr>
+                <td>{{order.id}}</td>
+                <td>{% if order.date %}{{order.date.strftime('%d-%m-%Y %H:%M')}}{% endif %}</td>
+                <td>{{order.product.name|truncate(40)}}</td>
+                <td>{{order.product.author.username.capitalize()}} ({{order.product.author.promocode}})</td>
+                {% if user.role != 0 %}
+                <td>{{order.mail|hide_mail}}</td>
+                {% else %}
+                <td>{% if order.status == 1  %}
+                    <a href="{{url_for('resend_goods', order_id=order.id)}}"><span class="material-icons text-success">mail</span></a>
+                    <a href="{{links.get(order.id)}}"><span class="material-icons text-success">link</span></a>
+
+                    {% endif %}
+                    {{order.mail}}
+                </td>
+                {% endif %}
+                <td>{{order.sum}}</td>
+                <td>{% if order.status == 1 %}<span class="material-icons text-success">task_alt</span>{% else %}<span class="material-icons">history_toggle_off</span>{% endif %}</td>
+            <td>{{order.refferer.username.capitalize()}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+                   </div>
+               <tr>
+                   <td><strong>Итого за период на сумму:</strong></td>
+
+                   <td><strong>{{orders.items|sum(attribute="sum")}} руб.</strong></td>
+               </tr>
+
+           </div>
+             </div>
+
+
+                      {% if orders.has_prev %}<a href="{{ url_for('sales', page = orders.prev_num, date_to=form.date_to.raw_data[0], date_from=form.date_from.raw_data[0], mail=form.buyer.data, author=form.author.data, ref=form.ref.data, product_name=form.product_name.data, is_paid=form.is_paid.data, id_desc=id_desc) }}" class="btn btn-white btn-rounded"><span class="material-icons">navigate_before</span></a>{% else %}<button type="button" class="btn btn-white btn-rounded" disabled><span class="material-icons">navigate_before</span></button>{% endif %}
+           {{start+1}}-{{end}} из {{total}}
+            {% if orders.has_next %}<a href="{{ url_for('sales', page = orders.next_num, date_to=form.date_to.raw_data[0], date_from=form.date_from.raw_data[0], mail=form.buyer.data, author=form.author.data, ref=form.ref.data, product_name=form.product_name.data, is_paid=form.is_paid.data, id_desc=id_desc) }}" class="btn btn-white btn-rounded"><span class="material-icons">navigate_next</span></a>{% else %}<button type="button" class="btn btn-white btn-rounded" disabled><span class="material-icons">navigate_next</span></button>{% endif %}
+
+
+
+
+
+{% endblock %}
+
+
+
+

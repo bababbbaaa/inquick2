@@ -1,0 +1,37 @@
+ {% extends "base-admin.html" %}
+
+{% block container %}
+<div class="jumbotron">
+        <p class="lead">Нажимая кнопку "Открыть доступ" вы подтверждаете согласие с условиями соглашения, и будете перенаправлены на страницу, где сможете просмотреть/скачать материалы цифровых продуктов.</p>
+      </div>
+<div class="card">
+    <div class="card-block">
+            <h3>Соглашение об использовании материалов цифровых продуктов</h3>
+
+
+             <div class="row">
+                 <p class="text-justify">Публикация цифровых продуктов и порядок использования материалов цифровых продуктов регламентируется Приложением №3 к <a href="{{url_for('termsofuse_view')}}">Пользовательскому соглашению</a>. Пожалуйста, убедитесь, что вы ознакомлены с указанным документом.</p>
+
+                      </div>
+<div class="form-group">
+                <label class="c-input c-checkbox">
+                  <input type="checkbox" id="terms">
+                  <span class="c-indicator"></span> Я подтверждаю, что ознакомлен(а) с соглашением и безоговорочно принимаю его условия
+  </label>
+              </div>
+
+
+
+<form action="{{url_for('license')}}" method="POST">
+    <div class="row center">
+
+                      <input type='submit' class="btn btn-rounded btn-primary" id="submit_button" disabled value="Открыть доступ">
+
+    </div>
+
+</form>
+    </div>
+</div>
+
+
+ {% endblock %}

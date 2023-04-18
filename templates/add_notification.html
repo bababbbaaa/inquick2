@@ -1,0 +1,92 @@
+{% extends "base-admin.html" %}
+
+{% block container %}
+      <!-- Breadcrumb -->
+      <ol class="breadcrumb">
+        <li><a href="{{ url_for('dashboard')}}">Главная</a></li>
+        <li><a href="#">Уведомления</a></li>
+      </ol>
+
+<form action="{{url_for('add_notification')}}" method="POST">
+      <div class="row">
+
+        <div class="col-md-4">
+          <div class="card">
+               <div class="card-block">
+              <h5>Создание уведомления</h5>
+
+                <fieldset class="form-group ">
+
+                    {{ form.level.label }}
+                    {{ form.level (class="form-control")}}
+                                    {% if form.level.errors %}
+                    {% for msg in form.level.errors %}
+                     <small class="text-danger">{{msg}}</small>
+                    {% endfor %}
+                    {% endif %}
+                </fieldset>
+                  <fieldset class="form-group">
+                      {{ form.message.label }}
+                      {{ form.message (class="form-control", rows="3")}}
+                                      {% if form.message.errors %}
+                    {% for msg in form.mesage.errors %}
+                     <small class="text-danger">{{msg}}</small>
+                    {% endfor %}
+                    {% endif %}
+                </fieldset>
+
+
+              <hr>
+
+                   {{ form.csrf_token }}
+       <button type="submit" class="btn btn-success btn-rounded">Создать</button> <a href="{{url_for('dashboard')}}" class="btn btn-white btn-rounded">Отмена</a>
+
+
+
+
+            </div>
+          </div>
+
+        </div>
+                  <div class="col-md-8">
+          <div class="card">
+               <div class="card-block">
+<h5>Уведомления</h5>
+                    <table class="table">
+
+          <tbody>
+          {% for notification in notifications %}
+
+              <tr>
+                  <td>{{notification.date.strftime('%d-%m-%Y %H:%M')}}</td>
+            <td>{{notification.sender.username}}</td>
+              <td>{{notification_level.get(notification.level)}}</td>
+              <td>{{notification.message|truncate(40)}}</td>
+              <td><a href="{{url_for('delete_notification', notification_id=notification.id)}}">Удалить</a></td>
+            </tr>
+           {% endfor %}
+          {% if not notifications %}
+          Пока нет уведомлений
+          {% endif %}
+
+          </tbody>
+        </table>
+
+
+
+
+
+
+
+
+               </div>
+          </div>
+                  </div>
+
+      </div>
+
+
+</form>
+
+{% endblock %}
+

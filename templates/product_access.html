@@ -1,0 +1,82 @@
+{% extends "base-admin.html" %}
+
+{% block container %}
+
+      <!-- Breadcrumb -->
+      <ol class="breadcrumb">
+        <li><a href="{{ url_for('dashboard')}}">Главная</a></li>
+        <li><a href="{{url_for('product')}}">Продукты</a></li>
+          <li><a href="#">Управление доступом</a></li>
+      </ol>
+        <div class="jumbotron">
+        <p class="lead">В этом разделе вы можете ограничить действие промокода для каждого конкретного реферала</p>
+      </div>
+
+
+      <div class="row">
+
+        <div class="col-12">
+          <div class="card">
+               <div class="card-block">
+              <h5>Управление доступом</h5>
+                   <hr>
+ <div class="table-access-box">
+     <form action="{{url_for('edit_product', product_id=product.id, command='access')}}" method="POST">
+        <table class="table">
+
+          <tbody>
+          {% for referal in reps %}
+
+              <tr>
+
+              <td>{{roles.get(referal.role)}}</td>
+              <td>{% if referal.username %}{{referal.username}}{% else %}Без имени{% endif %}</td>
+              <td>{{referal.promocode}}</td>
+                  {% if referal.id in product_ids %}
+                  <td><span class="material-icons text-success">check_circle</span>Доступ разрешен</td>
+              <td><a href="{{url_for('control_access', product_id=product.id, user_id=referal.id, command='deny')}}">Запретить</a></td>
+                  {% else %}
+                   <td><span class="material-icons text-danger">cancel</span>Доступ запрещен</td>
+              <td><a href="{{url_for('control_access', product_id=product.id, user_id=referal.id, command='allow')}}">Разрешить</a></td>
+                  {% endif %}
+
+            </tr>
+           {% endfor %}
+
+          </tbody>
+        </table>
+     </form>
+ </div>
+
+
+
+
+       <a href="{{url_for('product')}}" class="btn btn-white btn-rounded">Закрыть</a>
+
+
+
+
+            </div>
+          </div>
+
+        </div>
+          </div>
+                  <div class="row">
+                      <div class="col-12">
+
+          <div class="card">
+               <div class="card-block">
+                   Помощь
+                   <hr>
+                   В этом разделе можно запретить/разрешить доступ к продуктам, добавленным вами, для каждого реферала.<br>Если запретить доступ к продукту - пользователь не сможет видеть его в разделе "Продукты" и его промокод не будет применяться для скидки на этот продукт.
+               </div>
+          </div>
+                  </div>
+
+      </div>
+
+
+
+
+{% endblock %}
+

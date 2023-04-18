@@ -1,0 +1,43 @@
+ <!--**********************************
+            Nav header start
+        ***********************************-->
+        <div class="nav-header">
+            <a href="index.html" class="brand-logo">
+				<img class="logo-abbr mt-1" width="56"  src="{{url_for('static', filename='images/logo.png')}}" >
+
+                <img class="brand-title" width="124px"  src="{{url_for('static', filename='images/logo-text.png')}}">
+
+            </a>
+            <div class="nav-control">
+                <div class="hamburger">
+                    <span class="line"></span><span class="line"></span><span class="line"></span>
+                </div>
+            </div>
+        </div>
+        <!--**********************************
+            Nav header end
+        ***********************************-->
+
+		
+		<!--**********************************
+            Header start
+        ***********************************-->
+        <div class="header">
+            <div class="header-content">
+                <nav class="navbar navbar-expand">
+                    <div class="collapse navbar-collapse justify-content-between">
+                        <div class="header-left">
+							<div class="dashboard_bar">
+                                Рабочий кабинет
+                            </div>
+                        </div>
+                        {% include 'menu/right-menu.html' %}
+                    </div>
+				</nav>
+			</div>
+		</div>
+        <!--**********************************
+            Header end ti-comment-alt
+        ***********************************-->
+
+       {% include 'menu/sidebar.html' %}

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<style>
+    .genric-btn {
+  display: inline-block;
+  outline: none;
+  line-height: 40px;
+  padding: 0 30px;
+  font-size: .8em;
+  text-align: center;
+  text-decoration: none;
+  font-weight: 500;
+  cursor: pointer;
+  -webkit-transition: all 0.3s ease 0s;
+  -moz-transition: all 0.3s ease 0s;
+  -o-transition: all 0.3s ease 0s;
+  transition: all 0.3s ease 0s; }
+
+.genric-btn:focus {
+  outline: none; }
+
+.genric-btn.e-large {
+  padding: 0 40px;
+  line-height: 50px; }
+
+.genric-btn.large {
+  line-height: 45px; }
+
+.genric-btn.medium {
+  line-height: 30px; }
+
+.genric-btn.small {
+  line-height: 25px; }
+
+.genric-btn.radius {
+  border-radius: 3px; }
+
+.genric-btn.circle {
+  border-radius: 20px; }
+
+.genric-btn.arrow {
+  display: -webkit-inline-box;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center; }
+
+.genric-btn.arrow span {
+  margin-left: 10px; }
+
+.genric-btn.default {
+  color: #222222;
+  background: #f9f9ff;
+  border: 1px solid transparent; }
+
+.genric-btn.default:hover {
+  border: 1px solid #f9f9ff;
+  background: #fff; }
+
+.genric-btn.default-border {
+  border: 1px solid #f9f9ff;
+  background: #fff; }
+
+.genric-btn.default-border:hover {
+  color: #222222;
+  background: #f9f9ff;
+  border: 1px solid transparent; }
+
+.genric-btn.primary {
+  color: #fff;
+  background: #f8b600;
+  border: 1px solid transparent; }
+
+.genric-btn.primary:hover {
+  color: #f8b600;
+  border: 1px solid #f8b600;
+  background: #fff; }
+
+.genric-btn.primary-border {
+  color: #f8b600;
+  border: 1px solid #f8b600;
+  background: #fff; }
+
+.genric-btn.primary-border:hover {
+  color: #fff;
+  background: #f8b600;
+  border: 1px solid transparent; }
+
+.genric-btn.success {
+  color: #fff;
+  background: #4cd3e3;
+  border: 1px solid transparent; }
+
+.genric-btn.success:hover {
+  color: #4cd3e3;
+  border: 1px solid #4cd3e3;
+  background: #fff; }
+
+.genric-btn.success-border {
+  color: #4cd3e3;
+  border: 1px solid #4cd3e3;
+  background: #fff; }
+
+.genric-btn.success-border:hover {
+  color: #fff;
+  background: #4cd3e3;
+  border: 1px solid transparent; }
+
+.genric-btn.info {
+  color: #fff;
+  background: #38a4ff;
+  border: 1px solid transparent; }
+
+.genric-btn.info:hover {
+  color: #38a4ff;
+  border: 1px solid #38a4ff;
+  background: #fff; }
+
+.genric-btn.info-border {
+  color: #38a4ff;
+  border: 1px solid #38a4ff;
+  background: #fff; }
+
+.genric-btn.info-border:hover {
+  color: #fff;
+  background: #38a4ff;
+  border: 1px solid transparent; }
+
+.genric-btn.warning {
+  color: #fff;
+  background: #f4e700;
+  border: 1px solid transparent; }
+
+.genric-btn.warning:hover {
+  color: #f4e700;
+  border: 1px solid #f4e700;
+  background: #fff; }
+
+.genric-btn.warning-border {
+  color: #f4e700;
+  border: 1px solid #f4e700;
+  background: #fff; }
+
+.genric-btn.warning-border:hover {
+  color: #fff;
+  background: #f4e700;
+  border: 1px solid transparent; }
+
+.genric-btn.danger {
+  color: #fff;
+  background: #f44a40;
+  border: 1px solid transparent; }
+
+.genric-btn.danger:hover {
+  color: #f44a40;
+  border: 1px solid #f44a40;
+  background: #fff; }
+
+.genric-btn.danger-border {
+  color: #f44a40;
+  border: 1px solid #f44a40;
+  background: #fff; }
+
+.genric-btn.danger-border:hover {
+  color: #fff;
+  background: #f44a40;
+  border: 1px solid transparent; }
+
+.genric-btn.link {
+  color: #222222;
+  background: #f9f9ff;
+  text-decoration: underline;
+  border: 1px solid transparent; }
+
+.genric-btn.link:hover {
+  color: #222222;
+  border: 1px solid #f9f9ff;
+  background: #fff; }
+
+.genric-btn.link-border {
+  color: #222222;
+  border: 1px solid #f9f9ff;
+  background: #fff;
+  text-decoration: underline; }
+
+.genric-btn.link-border:hover {
+  color: #222222;
+  background: #f9f9ff;
+  border: 1px solid transparent; }
+
+.genric-btn.disable {
+  color: #222222, 0.3;
+  background: #f9f9ff;
+  border: 1px solid transparent;
+  cursor: not-allowed; }
+</style>
+<div style="width:500px;">
+<a href="#" class="genric-btn primary">Купить</a>
+</div>
+</body>
+</html>
+
+
+								<script type="text/javascript" src="https://auth.robokassa.ru/Merchant/PaymentForm/FormSS.js?MerchantLogin=mimilook&InvoiceID=0&Culture=ru&Encoding=utf-8&OutSum=0,00&SignatureValue=101c63ec494eaf281757b6a7ab6b457d"></script>
+								<a href="#"><img src="https://yastatic.net/s3/doc-binary/freeze/ru/id/816840a644c625b1bf570b6351bdf6e4221538c5.svg"></a>
+<script>
+Это скрипт
+    document.write("<iframe width=\"242\" height=\"55\" style=\"border:0;width:242px;height:55px;overflow:hidden;background-color:transparent;\" allowTransparency=\"true\" src=\"https://auth.robokassa.ru/Merchant/PaymentForm/FormSS.if\"></iframe>");
+</script>
+
+Это айфрейм
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<title></title>
+	<link rel="stylesheet" type="text/css" href="/Merchant/PaymentForm/Styles\Forms.css" />
+</head>
+<body>
+	<div class="formS shadows lifted">
+		<div>
+			<a href="https://auth.robokassa.ru/Merchant/Index.aspx" target="_top">оплатить</a>
+			<img src="/Merchant/PaymentForm/Images\logo-m.png" />
+		</div>
+	</div>
+</body>
+</html>

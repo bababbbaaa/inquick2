@@ -1,0 +1,59 @@
+{% extends "base-admin.html" %}
+
+{% block container %}
+
+      <!-- Breadcrumb -->
+      <ol class="breadcrumb">
+        <li><a href="{{ url_for('dashboard')}}">Главная</a></li>
+        <li>Отчеты</li>
+      </ol>
+        <div class="jumbotron">
+        <p class="lead">В этом разделе отображаются финансовые и отчетные документы по вашему профилю. Просмотреть и загрузить документы вы сможете нажав на название документа. Если у вас возникнут вопросы - обратитесь в поддержку</p>
+      </div>
+<div class="clearfix"></div>
+       <div class="card">
+        <div class="card-header">
+          <h5 class="card-title">Документы</h5>
+        </div>
+           <div class="card-block">
+               {% if documents %}
+        <table id="sales" class="table table-striped table-hover table-sm">
+          <thead style="cursor: pointer;">
+            <tr>
+                <th>Документ</th>
+              <th id="date_sort">Дата</th>
+
+                <th></th>
+                <th></th>
+            </tr>
+          </thead>
+
+            {% for document in documents %}
+            <tr>
+                <td><a href="{{url_for('get_document', document_id=document.id)}}"><span class="material-icons">description</span> {{document.name}}</a></td>
+                <td>{{document.sent_date.strftime('%d-%m-%Y %H:%M')}}</td>
+                <td>{% if user.role== 0 %}<a href="{{url_for('delete_document', document_id=document.id)}}">Удалить</a>{% endif %}</td>
+                <th>{% if document.read_date %}<span class="material-icons text-success">mark_email_read</span>{% else %}<span class="material-icons text-primary">mark_email_unread</span>{% endif %}</th>
+            </tr>
+            {% endfor %}
+
+        </table>
+        {% else %}
+            <p class="center">Документов нет</p>
+            {% endif%}
+           </div>
+
+             </div>
+
+   {% if user.role == 0  %}
+<a href="{{url_for('add_report')}}"><button type="button" class="btn btn-primary btn-rounded"><span class="material-icons">add</span> Добавить документ</button></a>
+{% endif %}
+
+
+
+
+{% endblock %}
+
+
+
+

@@ -1,0 +1,92 @@
+{% extends "base-admin.html" %}
+
+{% block container %}
+      <!-- Breadcrumb -->
+      <ol class="breadcrumb">
+        <li><a href="{{ url_for('dashboard')}}">Главная</a></li>
+        <li><a href="#">Продукты</a></li>
+      </ol>
+        <div class="jumbotron">
+        <p class="lead">Добавьте файл или ссылку на облачное хранилище/youtube/чат или канал в телеграм, к которым нужно предоставить доступ покупателю после оплаты</p>
+      </div>
+{% if not attachment %}
+<form action="{{url_for('add_attachment', product_id=product_id, a_type=type)}}" method="POST" enctype=multipart/form-data>
+{% else %}
+    <form action="{{url_for('edit_attachment', attachment_id=attachment.id, command='edit')}}" method="POST" enctype=multipart/form-data>
+{% endif %}
+      <div class="row">
+
+        <div class="col-md-6">
+          <div class="card">
+               <div class="card-block">
+              <h5>{% if attachment %}Изменение{% else %}Добавление{% endif %} материала  (
+                  {%if type=='file'%}
+                  файл
+                  {% else %}
+                  ссылка
+                  {% endif %}
+                  )</h5>
+
+                <fieldset class="form-group">
+
+                    {% if type =='file' and attachment %}
+                    <button type="button" class="btn btn-white btn-rounded-deep" disabled alt="Если необходимо заменить файл - загрузите его заново, удалив старый">{{ form.content.data }}</button>
+
+
+                    {% else %}
+
+                    {{ form.content.label }}
+                    {{ form.content (class="form-control")}}
+
+                    {% if form.content.errors %}
+                    {% for msg in form.content.errors %}
+                     <small class="text-danger">{{msg}}</small>
+                    {% endfor %}
+                    {% endif %}
+                    {% endif %}
+                </fieldset>
+                  <fieldset class="form-group">
+                      {{ form.description.label }}
+                      {{ form.description (class="form-control")}}
+                                      {% if form.description.errors %}
+                    {% for msg in form.description.errors %}
+                     <small class="text-danger">{{msg}}</small>
+                    {% endfor %}
+                    {% endif %}
+                </fieldset>
+
+              <hr>
+
+
+
+
+                   {{ form.csrf_token }}
+       <button type="submit" class="btn btn-success btn-rounded">Сохранить</button> <a href="{{url_for('product')}}" class="btn btn-white btn-rounded">Отмена</a>
+
+
+
+
+            </div>
+          </div>
+
+        </div>
+                  <div class="col-md-6">
+          <div class="card">
+              <div class="card-block">
+                   {%if type=='file'%}
+                   Выберите файл на своем компьютере и загрузите.<br>В поле "Название материала" укажите название соответствующего материала в понятном для человека формате <br>Например, вы хотите загрузить файл "Меню на неделю(1000ккал).pdf", в поле "Название материала" для него можно написать "Меню на неделю на 1000 ккал", именно это наименование будет видеть ваш покупатель, когда будет видеть список файлов для загрузки.<br>
+                   <hr>Основная концепция сервиса на сегодняшний день - продажа цифровых продуктов преимущественно в текстовом/графическом формате, поэтому применяются ограничения на размер файла, и если ваш продукт - это видеофайлы, скорее всего вы столкнетесь с проблемой загрузки их к нам на сервер, мы рекомендуем загружать видеофайлы на Youtube, устанавливать ограничение доступа "Доступ по ссылке" (<a href="https://support.google.com/youtube/answer/157177">подробная инструкция как изменить доступ на YouTube</a>) и добавлять материал не в виде файла, а в виде ссылки.
+                                 {% else %}
+                  Укажите ссылку на материал, к которому нужно предоставить доступ. Название заполнять не обязательно, тогда оно будет автоматически подставлено из заголовка страницы, на которую ведет ссылка.
+                  {% endif %}
+               </div>
+          </div>
+                  </div>
+
+      </div>
+
+
+</form>
+
+{% endblock %}
+

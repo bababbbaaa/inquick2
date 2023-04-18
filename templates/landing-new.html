@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="ru">
+{% include "head.html" %}
+
+    <body>
+        
+        <!--================Header Menu Area =================-->
+        <header class="header_area">
+            <div class="main_menu">
+            	<nav class="navbar navbar-expand-lg navbar-light">
+					<div class="container box_1620">
+						<!-- Brand and toggle get grouped for better mobile display -->
+						<a class="navbar-brand logo_h" href="{{url_for('main')}}"><img src="{{url_for('static', filename='landing-new/img/logo-light.png')}}" alt=""></a>
+						<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+						</button>
+						<!-- Collect the nav links, forms, and other content for toggling -->
+						<div class="collapse navbar-collapse offset" id="navbarSupportedContent">
+							<ul class="nav navbar-nav menu_nav ml-auto">
+								<li class="nav-item"><a class="nav-link" href="{{url_for('confirm', link=product.link)}}">Купить</a></li>
+								{% if product.commercial_name %}
+								<li class="nav-item"><a class="nav-link" href="#author">Об авторе</a></li>
+								{% endif %}
+								{% if not promocode_applied %}
+								<li class="nav-item"><a class="nav-link" href="{{url_for('confirm', link=product.link)}}">У меня есть промокод</a></li>
+								{% endif %}
+								<li class="nav-item"><a class="nav-link" href="#faq">FAQ</a></li>
+							</ul>
+						</div> 
+					</div>
+            	</nav>
+            </div>
+        </header>
+        <!--================Header Menu Area =================-->
+        
+        <!--================Home Banner Area =================-->
+        <section class="home_banner_area">
+           	<div class="container box_1620">
+           		<div class="banner_inner d-flex align-items-center">
+					<div class="banner_content">
+						<div class="media">
+							<div class="d-flex">
+								{% if product.main_img %}
+								<img src="{{url_for('uploaded_file',landing_folder=product.link,filename=product.main_img)}}" style="max-width:740px; max-height:600px;" alt="">
+								{% else %}
+								<img src="{{url_for('static', filename='images/default-main-img.png')}}" style="max-width: 740px; max-height:600px;" alt="">
+								{% endif %}
+							</div>
+							<div class="media-body">
+								<div class="personal_text">
+									<h6>{{product.content_info}}</h6>
+									<h3 id="prod_name">{{product.name}}</h3>
+									<h4>{{product.short_description}}</h4>
+									<p>{{product.description}}</p>
+									{% if multiple_result %}
+									<ul class="unordered-list">
+										{% for line in main_result %}
+										<li>{{line}}</li>
+										{% endfor %}
+									</ul>
+									{% else %}
+									<h4>{{main_result}}</h4>
+									{% endif %}
+
+								</div>
+	<div class="text-center align-bottom mt-3">
+		{% if promocode_applied %}
+		<h1><small><s>{{product.price}}</s></small> {{product.promo_price}} <small>руб.</small></h1>
+		<small>по промокоду <span class="text-warning">{{promocode_applied}}</span></small>
+
+		{% else %}
+		<h1>{{product.price}} <small>руб.</small></h1>
+		{% endif %}
+								</div>
+								<div class="text-center align-middle">
+									{% if not product.archived %}
+											<a href="{{url_for('confirm', link=product.link)}}"  class="genric-btn primary e-large w-75">Купить сейчас</a>
+									{% else %}
+									<p class="text-warning mt-2">К сожалению в данный момент продукт не доступен к покупке</p>
+									{% endif %}
+								</div>
+
+
+							</div>
+						</div>
+					</div>
+				</div>
+            </div>
+        </section>
+        <!--================End Home Banner Area =================-->
+{% if product.commercial_name %}
+                <section class="welcome_area p_120">
+        	<div class="container">
+				<div class="welcome_text">
+					<a name="author"></a>
+				<h4 class="text-center">Автор</h4>
+				</div>
+        		<div class="row welcome_inner">
+				<div class="col-md-3">
+
+					<article class="item">
+  <div class="photo">
+	  {% if product.author_avatar %}
+    <img class="personPhoto" alt="" src="{{url_for('uploaded_file',landing_folder=product.link,filename=product.author_avatar)}}">
+	  {% else %}
+	   <img class="personPhoto" alt="" src="{{url_for('static',filename='images/avatar.png')}}">
+	  {% endif %}
+
+  </div>
+</article>
+<p class="h6 pt-2 text-center">{{product.commercial_name}}</p>
+					</div>
+					<div class="col-md-9 mt-sm-20 d-flex align-content-center flex-wrap">
+
+
+						<p class="pl-2">{{product.about_info}}</p>
+					</div>
+
+				</div>
+			</div>
+				</section>
+{% endif %}
+        <!--================End Welcome Area =================-->
+        
+        <!--================My Tabs Area =================-->
+        <section class="mytabs_area p_120">
+        	<div class="container">
+				        		<div class="text-center text-white m-5">
+        			<a name="faq"><h2>FAQ</h2></a>
+        			<p>Мы постарались ответить на некоторые вопросы, которые могут возникнуть у вас при оформлении заказа, но если вы не нашли ответа - напишите в службу поддержки</p>
+        		</div>
+		<div class="text-white m-5">
+								<h4>Когда я получу материалы купленного продукта/курса/гайда? </h4>
+								<p>Доступ к материалам будет предоставлен сразу после оплаты. Также мы отправим на указанную Вами электронную почту письмо, где продублируем ссылку на заказанный продукт. </p>
+
+		</div>
+				<div class="text-white m-5">
+					<h4>Мне не пришло письмо с материалами продукта, почту указал(а) верно, что делать?</h4>
+								<p>Проверьте папку спам и промоакции. Если письма нет, тогда напишите на почту  <a href="{{url_for('support', branch=product.link)}}"><strong><u>технической поддержки</u></strong></a>.</p>
+				</div>
+								<div class="text-white m-5">
+					<h4>Я неверно указал(а) свою электронную почту?</h4>
+								<p>Напишите в службу <a href="{{url_for('support', branch=product.link)}}"><strong><u>технической поддержки</u></strong></a>.</p>
+				</div>
+
+        	</div>
+        </section>
+        <!--================End My Tabs Area =================-->
+
+
+{% include "footer.html" %}
+
+
+	    </body>
+</html>
+

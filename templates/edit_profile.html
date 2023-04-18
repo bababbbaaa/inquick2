@@ -1,0 +1,94 @@
+{% extends "base-admin.html" %}
+
+{% block container %}
+      <!-- Breadcrumb -->
+      <ol class="breadcrumb">
+        <li><a href="{{ url_for('dashboard')}}">Главная</a></li>
+        <li><a href="#">Редактировать профиль</a></li>
+      </ol>
+
+
+<form action="{{url_for('edit_profile')}}" method="POST">
+      <div class="row">
+
+        <div class="col-md-6">
+          <div class="card">
+               <div class="card-block">
+              <h5>Редактирование профиля</h5>
+
+
+                <fieldset class="form-group ">
+
+                    {{ form.promocode.label }}
+                    {{ form.promocode (class="form-control")}}
+                  <small class="text-help">Ваш личный промокод</small>
+                                        {% if form.promocode.errors %}
+                                        {% for msg in form.promocode.errors %}
+                                         <small class="text-danger">{{msg}}</small>
+                                        {% endfor %}
+                                        {% endif %}
+                </fieldset>
+                  <fieldset class="form-group">
+                      {{ form.phone.label }}
+                      {{ form.phone (class="form-control")}}
+                                        {% if form.phone.errors %}
+                                        {% for msg in form.phone.errors %}
+                                         <small class="text-danger">{{msg}}</small>
+                                        {% endfor %}
+                                        {% endif %}
+                </fieldset>
+                  <fieldset class="form-group">
+                      {{ form.role (class="form-control", disabled=True)}}
+
+                  <small class="text-help">Изменить права доступа может только тот, кто выдал приглашение</small>
+                </fieldset>
+                                     <fieldset class="form-group">
+                      {{ form.name.label }}
+                      {{ form.name (class="form-control")}}
+                                      {% if form.name.errors %}
+                    {% for msg in form.name.errors %}
+                     <small class="text-danger">{{msg}}</small>
+                    {% endfor %}
+                    {% endif %}
+                </fieldset>
+                  <fieldset class="form-group">
+                      {{ form.mail.label }}
+                      {{ form.mail (class="form-control")}}
+                                      {% if form.mail.errors %}
+                    {% for msg in form.mail.errors %}
+                     <small class="text-danger">{{msg}}</small>
+                    {% endfor %}
+                    {% endif %}
+                </fieldset>
+              <hr>
+
+
+
+
+                   {{ form.csrf_token }}
+       <button type="submit" class="btn btn-success btn-rounded">Сохранить</button> <a href="{{url_for('dashboard')}}" class="btn btn-white btn-rounded">Отмена</a>
+
+
+
+
+            </div>
+          </div>
+
+        </div>
+                  <div class="col-md-6">
+          <div class="card">
+
+               <div class="card-block">
+                   <h5>Выход из профиля</h5>
+                   <a href="{{url_for('logout')}}" class="btn btn-danger btn-rounded">Выйти из личного кабинета</a>
+               </div>
+          </div>
+                  </div>
+
+      </div>
+
+
+</form>
+
+{% endblock %}
+

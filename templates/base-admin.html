@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html class="bootstrap-layout">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Личный кабинет</title>
+
+  <!-- Prevent the demo from appearing in search engines (REMOVE THIS) -->
+  <meta name="robots" content="noindex">
+
+
+{% include "css.html" %}
+
+
+</head>
+
+<body class="layout-container ls-top-navbar si-l3-md-up">
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-light bg-white navbar-full navbar-fixed-top ls-left-sidebar">
+
+    <!-- Sidebar toggle -->
+    <button class="navbar-toggler pull-xs-left hidden-lg-up" type="button" data-toggle="sidebar" data-target="#sidebarLeft"><span class="material-icons">menu</span></button>
+
+    <!-- Brand -->
+    <a class="navbar-brand first-child-md" href="{{url_for('dashboard')}}">Личный кабинет</a>
+
+
+    <!-- Menu -->
+    <ul class="nav navbar-nav pull-xs-right hidden-md-down">
+<li class="nav-item">
+<a class="nav-link" href="{{url_for('help')}}"  role="button" ><i class="material-icons">contact_support</i></a>
+        </li>
+
+
+      <!-- User dropdown -->
+      <li class="nav-item dropdown">
+        <a class="nav-link active dropdown-toggle p-a-0" data-toggle="dropdown" href="#" role="button" aria-haspopup="false">
+          <img src="{{ url_for('static', filename='assets/images/avatar.png') }}" alt="Avatar" class="img-circle" width="40">
+        </a>
+        <div class="dropdown-menu dropdown-menu-right dropdown-menu-list" aria-labelledby="Preview">
+          <a class="dropdown-item" href="{{url_for('edit_profile')}}"><i class="material-icons md-18">person</i> <span class="icon-text">Редактировать профиль</span></a>
+            <a class="dropdown-item" href="{{url_for('edit_account')}}"><i class="material-icons md-18">account_balance</i> <span class="icon-text">Реквизиты</span></a>
+          <a class="dropdown-item" href="{{url_for('change_password')}}"><i class="material-icons md-18">lock</i> <span class="icon-text">Сменить пароль</span></a>
+          <a class="dropdown-item" href="{{url_for('logout')}}">Выйти</a>
+        </div>
+      </li>
+      <!-- // END User dropdown -->
+
+    </ul>
+    <!-- // END Menu -->
+
+  </nav>
+  <!-- // END Navbar -->
+
+  <!-- Sidebar -->
+  <div class="sidebar sidebar-left si-si-3 sidebar-visible-md-up sidebar-dark bg-primary" id="sidebarLeft" data-scrollable>
+
+    <!-- Brand -->
+    <a href="{{url_for('main')}}" class="sidebar-brand">
+      <i class="material-icons">control_point</i> ИНКВИК
+    </a>
+
+    <!-- User -->
+    <a href="{{url_for('edit_profile')}}" class="sidebar-link sidebar-user">
+      {{user.username.capitalize()}} ({{roles.get(user.role)}})
+    </a>
+    <!-- // END User -->
+
+    <!-- Menu -->
+    <ul class="sidebar-menu sm-bordered sm-active-button-bg">
+      <li class="sidebar-menu-item active">
+        <a class="sidebar-menu-button" href="{{ url_for('dashboard')}}">
+          <i class="sidebar-menu-icon material-icons">home</i> Статистика
+        </a>
+      </li>
+                 <li class="sidebar-menu-item">
+        <a class="sidebar-menu-button" href="{{ url_for('sales')}}">
+          <i class="sidebar-menu-icon material-icons">shopping_cart</i> Продажи
+        </a>
+      </li>
+
+
+            <li class="sidebar-menu-item">
+        <a class="sidebar-menu-button" href="{{ url_for('product')}}">
+
+          <i class="sidebar-menu-icon material-icons">auto_stories</i> Продукты
+        <span class="sidebar-menu-label label label-default">{{user.products|count}}</span></a>
+      </li>
+
+{% if user.role < 4 %}
+            <li class="sidebar-menu-item">
+        <a class="sidebar-menu-button" href="{{ url_for('referal')}}">
+          <i class="sidebar-menu-icon material-icons">supervisor_account</i> Рефералы
+        <span class="sidebar-menu-label label label-default">{{user.controled_users|count}}</span></a>
+      </li>
+      {% endif %}
+{% if user.role <= 1 %}
+            <li class="sidebar-menu-item">
+        <a class="sidebar-menu-button" href="{{ url_for('add_notification')}}">
+          <i class="sidebar-menu-icon material-icons">notification_important</i> Уведомления
+        </a>
+      </li>
+      {% endif %}
+     <li class="sidebar-menu-item">
+        <a class="sidebar-menu-button" href="{{ url_for('reports')}}">
+          <i class="sidebar-menu-icon material-icons">assignment</i> Отчеты
+        </a>
+      </li>
+
+            <li class="sidebar-menu-item">
+        <a class="sidebar-menu-button" href="#">
+          <i class="sidebar-menu-icon material-icons">contact_support</i> Поддержка
+        </a>
+        <ul class="sidebar-submenu">
+          <li class="sidebar-menu-item">
+            <a class="sidebar-menu-button" href="{{url_for('help')}}">База знаний</a>
+          </li>
+          <li class="sidebar-menu-item">
+            <a class="sidebar-menu-button" href="{{url_for('tickets')}}">Обращения</a>
+          </li>
+        </ul>
+      </li>
+
+        <li class="sidebar-menu-item">
+        <a class="sidebar-menu-button" href="#">
+          <i class="sidebar-menu-icon material-icons">tune</i> Настройки
+        </a>
+        <ul class="sidebar-submenu">
+          <li class="sidebar-menu-item">
+            <a class="sidebar-menu-button" href="{{url_for('edit_profile')}}">Мой профиль</a>
+          </li>
+          <li class="sidebar-menu-item">
+            <a class="sidebar-menu-button" href="{{url_for('edit_account')}}">Мои реквизиты</a>
+          </li>
+          <li class="sidebar-menu-item">
+            <a class="sidebar-menu-button" href="{{url_for('change_password')}}">Сменить пароль</a>
+          </li>
+          <li class="sidebar-menu-item">
+            <a class="sidebar-menu-button" href="{{url_for('logout')}}">Выход</a>
+          </li>
+        </ul>
+      </li>
+
+
+
+
+    </ul>
+    <!-- // END Menu -->
+
+
+
+
+
+  </div>
+  <!-- // END Sidebar -->
+
+  <!-- Right Sidebars -->
+
+  <!-- Content -->
+  <div class="layout-content" data-scrollable>
+    <div class="container-fluid">
+              {% if unread_notifications %}
+
+      {% for notification in unread_notifications %}
+            <div class="alert
+            {% if notification.level == 0 %}alert-info{% endif %}
+            {% if notification.level == 1 %}alert-warning{% endif %}
+            {% if notification.level == 2 %}alert-danger{% endif %}
+             alert-dismissible fade in" role="alert" id="notification">
+                <strong>Внимание!</strong></br>
+            {{notification.message}}
+              <button type="button" class="close" onclick="readNotification('{{notification.id}}')" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+      {% endfor %}
+{% endif %}
+        {% if not user.mail_confirm %}
+            <div class="alert alert-info alert-dismissible fade in" role="alert" id="mail-confirmation">
+            <strong>Подтвердите электронную почту</strong> На указанный вами адрес электронной почты {{user.mail}} было отправлено письмо, перейдите по ссылке из письма для подтверждения адреса электронной почты.<br><a href="{{url_for('resend_confirm_mail',email=user.mail)}}">Отправить письмо повторно</a>
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+{% endif %}
+        {% if msg %}
+            <div class="alert alert-{{msg_cat}} alert-dismissible fade in" role="alert" id="message">{{msg}}
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+{% endif %}
+
+{% block container %} {% endblock %}
+    </div>
+  </div>
+
+{% include "js.html" %}
+
+  {% if msg %}
+<script>
+$( document ).ready(function() {
+    $('#message').show('slow').delay(3000).hide('slow');
+});
+
+</script>
+{% endif %}
+</body>
+
+</html>

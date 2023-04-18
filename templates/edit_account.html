@@ -1,0 +1,100 @@
+{% extends "base-admin.html" %}
+
+{% block container %}
+      <!-- Breadcrumb -->
+      <ol class="breadcrumb">
+        <li><a href="{{ url_for('dashboard')}}">Главная</a></li>
+        <li><a href="#">Юридическая информация</a></li>
+      </ol>
+
+
+<form action="{{url_for('edit_account')}}" method="POST">
+      <div class="row">
+
+        <div class="col-md-6">
+          <div class="card">
+               <div class="card-block">
+              <h5>Редактирование юридической информации</h5>
+
+
+                <fieldset class="form-group ">
+                    {{ form.business_type.label }}
+                    {{ form.business_type (class="form-control")}}
+                </fieldset>
+
+                <fieldset class="form-group">
+                      {{ form.full_name.label (id="full-name-label")}}
+                      {{ form.full_name (class="form-control")}}
+                </fieldset>
+
+ <div id="person-fields">
+
+
+                <fieldset class="form-group" id="address-block">
+                      {{ form.address.label }}
+                      {{ form.address (class="form-control")}}
+                </fieldset>
+
+                <fieldset class="form-group" id="passport-block">
+                      {{ form.passport.label }}
+                      {{ form.passport (class="form-control")}}
+                </fieldset>
+
+</div>
+                <fieldset class="form-group" id="inn-block">
+                      {{ form.inn.label }}
+                      {{ form.inn (class="form-control")}}
+                </fieldset>
+
+                   <fieldset class="form-group" id="bank-account-block">
+                      {{ form.bank_account.label (id="bank-account-label") }}
+                      {{ form.bank_account (class="form-control")}}
+                </fieldset>
+
+                <fieldset class="form-group" id="bank-name-block">
+                      {{ form.bank_name.label }}
+                      {{ form.bank_name (class="form-control")}}
+                </fieldset>
+
+ <div id="company-fields">
+
+
+                <fieldset class="form-group" id="bank-bik-block">
+                      {{ form.bank_bik.label }}
+                      {{ form.bank_bik (class="form-control")}}
+                </fieldset>
+
+                <fieldset class="form-group" id="bank-kor-block">
+                      {{ form.bank_kor.label }}
+                      {{ form.bank_kor (class="form-control")}}
+                </fieldset>
+ </div>
+              <hr>
+
+                   {{ form.csrf_token }}
+       <button type="submit" class="btn btn-success btn-rounded">Сохранить</button> <a href="{{url_for('dashboard')}}" class="btn btn-white btn-rounded">Отмена</a>
+
+
+
+
+            </div>
+          </div>
+
+        </div>
+                  <div class="col-md-6">
+          <div class="card">
+               <div class="card-block">
+                   <span class="material-icons">info</span>
+                   Заполните информацию, необходимую для получения платежей
+
+               </div>
+          </div>
+                  </div>
+
+      </div>
+
+
+</form>
+
+{% endblock %}
+

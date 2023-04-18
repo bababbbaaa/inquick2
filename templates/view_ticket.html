@@ -1,0 +1,97 @@
+{% extends "base-admin.html" %}
+
+{% block container %}
+
+  <!-- Content -->
+  <div class="layout-content" data-scrollable>
+    <div class="container-fluid">
+
+      <ol class="breadcrumb">
+        <li><a href="{{url_for('dashboard')}}">Главная</a></li>
+        <li><a href="{{url_for('tickets')}}">Поддержка</a></li>
+          <li class="active">Обращения</li>
+      </ol>
+      <div class="row">
+        <div class="col-md-6">
+<h3>{{ticket.subject}}</h3>
+        </div>
+        <div class="col-md-6">Статус обращения: {% if ticket.status == 0 %}
+                  <span class="label label-pill label-success">
+                        {% endif %}
+                        {% if ticket.status == 1 %}
+                  <span class="label label-pill label-default">
+                        {% endif %}
+                        {% if ticket.status == 2 %}
+                  <span class="label label-pill label-warning">
+                        {% endif %}
+                        {% if ticket.status == 3 %}
+                  <span class="label label-pill label-primary">
+                        {% endif %}
+            {{status.get(ticket.status)}}</span></div>
+      </div>
+        {% if ticket.status == 0 %}
+              <div class="alert alert-info" role="alert">
+            <strong>Обращение закрыто.</strong> Если вы считаете, что вопрос не был решен - пожалуйста создайте новое обращение.
+          </div>
+        {% endif %}
+      {% for message in messages %}
+      <div class="card card-stats-primary">
+
+        <div class="card-block">
+          <p>Отправитель: {{message.sender.username.capitalize()}}</p>
+          <p>Отправлено: {{message.date.strftime('%d-%m-%Y %H:%M')}}</p>
+          <hr>
+          <p>{{ message.message }}</p>
+
+      </div>
+          </div>
+      {% endfor %}
+
+{% if ticket.status != 0 %}
+
+
+      <form action="{{url_for('view_ticket', ticket_id=ticket.id)}}" method="POST">
+      <div class="row">
+
+
+          <div class="card">
+               <div class="card-block">
+
+
+                  <fieldset class="form-group">
+                      {{ form.message.label }}
+                      {{ form.message (class="form-control", rows="3")}}
+                                      {% if form.message.errors %}
+                    {% for msg in form.mesage.errors %}
+                     <small class="text-danger">{{msg}}</small>
+                    {% endfor %}
+                    {% endif %}
+                </fieldset>
+
+
+              <hr>
+
+                   {{ form.csrf_token }}
+       <button type="submit" class="btn btn-success btn-rounded">Отправить</button> <a href="{{url_for('tickets')}}" class="btn btn-white btn-rounded">Отмена</a>{% if user.role == 0 %} <a href="{{url_for('close_ticket', ticket_id=ticket.id)}}" class="btn btn-danger btn-rounded">Закрыть обращение</a>{% endif %}
+
+
+
+
+            </div>
+          </div>
+
+
+
+
+
+               </div>
+
+
+</form>
+
+
+        {% endif %}
+  </div>
+  </div>
+
+{% endblock %}

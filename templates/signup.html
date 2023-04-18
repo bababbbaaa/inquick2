@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Регистрация</title>
+
+  <!-- Prevent the demo from appearing in search engines (REMOVE THIS) -->
+  <meta name="robots" content="noindex">
+
+  {% include "css.html" %}
+
+</head>
+
+<body class="login">
+
+    <div class="col-md-4 col-centered">
+            <h2 class="text-primary center m-a-2">
+        <i class="material-icons md-36">control_point</i> <span class="icon-text">ИНКВИК</span>
+      </h2>
+ <div class="card">
+          <div class="card-block center">
+            <h4 class="m-b-0">
+              <i class="material-icons">person_add</i> <span class="icon-text">Регистрация</span>
+            </h4>
+            <p class="text-muted">Создать новый аккаунт</p>
+            <form action="{{url_for('signup')}}" method="POST">
+              <div class="form-group">
+                  {{ form.name (class="form-control",  placeholder="Придумайте логин")}}
+                                 {% if form.name.errors %}
+                                    {% for msg in form.name.errors %}
+                                     <small class="text-danger">{{msg}}</small>
+                                    {% endfor %}
+                                    {% endif %}
+              </div>
+              <div class="form-group">
+                                    {{ form.mail (class="form-control",  placeholder="Электронная почта")}}
+                                 {% if form.mail.errors %}
+                                    {% for msg in form.mail.errors %}
+                                     <small class="text-danger">{{msg}}</small>
+                                    {% endfor %}
+                                    {% endif %}
+
+              </div>
+              <div class="form-group">
+                                {{ form.password (class="form-control", placeholder="Придумайте пароль")}}
+                                 {% if form.password.errors %}
+                                    {% for msg in form.password.errors %}
+                                     <small class="text-help">{{msg}}</small>
+                                    {% endfor %}
+                                    {% endif %}
+              </div>
+              <div class="form-group" id="confirm-password-group">
+                 {{ form.confirm_password (class="form-control", placeholder="Подтвердите пароль")}}
+                  <small class="text-help" class="pull-xs-right" id="pwd-msg"></small>
+              </div>
+            <hr>
+                            <div class="form-group">
+                 {{ form.promocode (class="form-control", placeholder="Код приглашения")}}
+                                 {% if form.promocode.errors %}
+                                    {% for msg in form.promocode.errors %}
+                                     <small class="text-help">{{msg}}</small>
+                                    {% endfor %}
+                                    {% endif %}
+                            <a href="{{url_for('support')}}" class="pull-xs-right">
+                  <small>Как получить код приглашения?</small>
+                </a>
+                              <div class="clearfix"></div>
+              </div>
+            {{ form.csrf_token }}
+                <div class="form-group">
+                <label class="c-input c-checkbox">
+                  <input type="checkbox" id="terms">
+                    <span class="c-indicator"></span> Соглашаюсь с условиями <a href="{{url_for('termsofuse_view')}}">Пользовательского соглашения</a> и <a href="{{url_for('privacy_view')}}">Политикой обработки персональных данных</a>
+  </label>
+              </div>
+              <button type="submit" id="signup-button" class="btn btn-primary btn-rounded" disabled>Зарегистрироваться</button>
+                   <div class="clearfix"></div>
+
+              <a href="{{url_for('login')}}" class="pull-xs-center">
+                  <small>Уже зарегистрированы?</small>
+                </a>
+            </form>
+          </div>
+        </div>
+
+  {% include "js.html" %}
+    </div>
+
+<script>
+$(document).ready(function() {
+
+   $('#pwd-msg').hide();
+
+});
+    $("input[name=password]").keyup(function() {
+  check_pwd();
+
+});
+$("input[name=confirm_password]").keyup(function() {
+  check_pwd();
+
+});
+function check_pwd() {
+if ($("input[name=password]").val() != $("input[name=confirm_password]").val()){
+
+$('#signup-button').prop("disabled", true);
+$('#pwd-msg').show();
+$("input[name=password]").addClass('form-control-warning');
+$("#confirm-password-group").addClass('has-warning');
+$('#pwd-msg').text('Пароли не совпадают');
+
+} else {
+console.log($("input[name=password]").val());
+if($('#terms').is(':checked') && $("input[name=password]").val() != ''){
+    $("#signup-button").prop("disabled", false);
+    } else {
+    $("#signup-button").prop("disabled", true);
+    }
+$('#pwd-msg').hide();
+$("input[name=password]").removeClass('form-control-warning');
+$("#confirm-password-group").removeClass('has-warning');
+}
+}
+
+$('#terms').click(function(){
+check_pwd();
+});
+
+</script>
+</body>
+
+</html>

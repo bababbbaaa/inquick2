@@ -1,0 +1,50 @@
+{% extends "admin/index.html" %}
+
+
+{% block container %}
+<!--**********************************
+            Content body start
+        ***********************************-->
+
+
+                        <div class="card">
+                            <div class="card-header">
+
+                                    <h4 class="card-title">Мои шаблоны</h4>
+
+                                <div class="d-none d-md-block">
+									<button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#templateModal">Добавить шаблон <span class="btn-icon-end"><i class="fa fa-plus"></i></span></button>
+                                </div>
+                            </div>
+                        </div>
+ <div class="d-md-none mb-3">
+									<button type="button" class="btn btn-block btn-info" data-bs-toggle="modal" data-bs-target="#templateModal"><i class="fa fa-plus me-2"></i> Добавить шаблон</button>
+                                </div>
+<div class="row">
+    <div class="col-12">
+
+
+     <div class="card">
+                            <div class="card-header">
+
+                                <h4 class="card-title">Приветствие для эксперта</h4>
+                            </div>
+                            <div class="card-body">
+
+                                <textarea class="form-control" rows="5" style="height: auto;">Здравствуйте! Это мой шаблон сообщщения для эксперта. Бла бла бла. Спасибо</textarea>
+                            </div>
+                            <div class="card-footer d-sm-flex justify-content-between align-items-center">
+                                <div class="card-footer-link mb-4 mb-sm-0">
+                                    <p class="card-text text-danger d-inline">(х) удалить</p>
+                                </div>
+
+                                <a href="javascript:void(0);" class="btn btn-primary"><i class="fa fa-copy me-2"></i>Скопировать</a>
+                            </div>
+                        </div>
+        </div>
+</div>
+
+{% endblock %}
+        <!--**********************************
+            Content body end
+        ***********************************-->

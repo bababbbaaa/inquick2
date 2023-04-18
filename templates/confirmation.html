@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+{% include "head.html" %}
+    <body>
+        
+        <!--================Header Menu Area =================-->
+        <header class="header_area">
+            <div class="main_menu">
+            	<nav class="navbar navbar-expand-lg navbar-light">
+					<div class="container box_1620">
+						<!-- Brand and toggle get grouped for better mobile display -->
+						<a class="navbar-brand logo_h" href="{{url_for('main')}}"><img src="{{url_for('static', filename='landing-new/img/logo-light.png')}}" alt=""></a>
+						<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+						</button>
+						<!-- Collect the nav links, forms, and other content for toggling -->
+						<div class="collapse navbar-collapse offset" id="navbarSupportedContent">
+							<ul class="nav navbar-nav menu_nav ml-auto">
+								<li class="nav-item"><a class="nav-link" href="{{url_for('support', branch=product.link)}}">Техническая поддержка</a></li>
+							</ul>
+						</div>
+					</div>
+            	</nav>
+            </div>
+        </header>
+        <!--================Header Menu Area =================-->
+        
+        <!--================Home Banner Area =================-->
+        <section class="home_banner_area">
+           	<div class="container box_1620">
+           		<div class="banner_inner d-flex align-items-center">
+					<div class="banner_content">
+						<div class="media">
+							<div class="d-flex">
+								{% if product.main_img %}
+								<img src="{{url_for('uploaded_file',landing_folder=product.link,filename=product.main_img)}}" style="max-width:740px; max-height:600px;" alt="">
+								{% else %}
+								<img src="{{url_for('static', filename='images/default-main-img.png')}}" style="max-width:740px; max-height:600px;" alt="">
+								{% endif %}
+							</div>
+							<div class="media-body">
+								<div class="personal_text">
+									<h6>{{product.content_info}}</h6>
+									<h3 id="prod_name">{{product.name}}</h3>
+									<h4>Оформление заказа</h4>
+								</div>
+				<div class="text-center align-bottom mt-3">
+					  {% if not promocode_applied %}
+							 <p class="font-weight-light">Сумма к оплате: <b>{{product.price}}</b> руб.</p>
+							 {% else %}
+							 <p class="font-weight-light">Сумма к оплате: <s>{{product.price}}</s> <b><span class="text-primary">{{product.promo_price}}</span></b> руб. специальная цена по промокоду <span class="text-primary">{{promocode_applied}}</span> </p>
+							 {% endif %}
+					</div>
+								{% if not promocode_applied %}
+    								 <div class="row justify-content-center">
+                						 <p class="font-weight-light mx-5 my-2">У вас есть промокод?</p>
+									 </div>
+									<form action="{{url_for ('apply_promocode', product=product.link)}}" method="POST">
+									<div class="row justify-content-center">
+										{{ form_promo.promocode (class="single-input w-75 mx-1", placeholder='Укажите промокод')}}
+									</div>
+									 <div class="row justify-content-center">
+									 <button type="submit" class="genric-btn primary e-large w-75 mt-2">Применить промокод</button></div>
+										{{ form_promo.csrf_token }}
+									</form>
+								   <p class="text-center text-danger mx-5 my-2">{{ msg }}</p>
+								{% endif %}
+
+            <hr class="w-75">
+								<form action="{{url_for ('confirm', link=product.link)}}" method="POST">
+								<div class="row justify-content-center">
+									<p class="font-weight-light mx-4 w-75">Укажите адрес электронной почты, мы отправим на него чек об оплате и реквизиты для доступа к материалам продукта </p>
+									{{ form.mail (class="single-input w-75 mx-1", placeholder='Укажите электронную почту')}}
+									  {% for field in form.errors %}
+											  {% for message in form.errors[field] %}
+												<small class="text-center text-danger mx-5 my-2">{{ message }}</small>
+											{% endfor %}
+										  {% endfor %}
+								</div>
+									 <div class="row justify-content-center">
+										 {% if not product.archived %}
+									 <button type="submit" class="genric-btn primary e-large w-75 mt-2">Купить сейчас</button>
+										 {% else %}
+										 <p class="text-warning mt-2">К сожалению в данный момент продукт не доступен к покупке</p>
+										{% endif %}
+										 <p class="font-weight-light mt-1 w-75">Нажимая на кнопку "Оформить заказ" вы соглашаетесь с <a href="{{url_for('oferta_view')}}" target="_blank">Пользовательским соглашением</a> и даете согласие на обработку <a href="{{url_for('privacy_view')}}" target="_blank">персональных данных</a></p>
+									 </div>
+									      {{ form.csrf_token }}
+								</form>
+
+
+
+							</div>
+						</div>
+					</div>
+				</div>
+            </div>
+        </section>
+        <!--================End Home Banner Area =================-->
+
+        <!--================End Welcome Area =================-->
+        
+
+
+
+{% include "footer.html" %}
+
+
+	    </body>
+</html>
+

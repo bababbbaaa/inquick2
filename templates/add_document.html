@@ -1,0 +1,76 @@
+{% extends "base-admin.html" %}
+
+{% block container %}
+      <!-- Breadcrumb -->
+      <ol class="breadcrumb">
+        <li><a href="{{ url_for('dashboard')}}">Главная</a></li>
+        <li><a href="{{ url_for('reports')}}">Отчеты</a></li>
+          <li>Добавить документ</li>
+      </ol>
+
+<form action="{{url_for('add_report')}}" method="POST" enctype=multipart/form-data>
+      <div class="row">
+
+        <div class="col">
+          <div class="card">
+               <div class="card-block">
+              <h5>Добавить документ</h5>
+
+                <fieldset class="form-group ">
+
+                    {{ form.recipient.label }}
+                         {{form.recipient(class="form-control", list="recipientlist",placeholder="Начните вводить имя пользователя/промокод")}}
+<datalist id="recipientlist">
+{% for u in userlist %}
+    <option value="{{u.username}}">{{u.promocode}}</option>
+{% endfor %}
+
+</datalist>
+                                    {% if form.recipient.errors %}
+                    {% for msg in form.recipient.errors %}
+                     <small class="text-danger">{{msg}}</small>
+                    {% endfor %}
+                    {% endif %}
+                </fieldset>
+                  <fieldset class="form-group">
+                      {{ form.name.label }}
+                      {{ form.name (class="form-control")}}
+                                      {% if form.name.errors %}
+                    {% for msg in form.name.errors %}
+                     <small class="text-danger">{{msg}}</small>
+                    {% endfor %}
+                    {% endif %}
+                </fieldset>
+                         <fieldset class="form-group">
+                      {{ form.document.label }}
+                      {{ form.document (class="form-control")}}
+                                      {% if form.document.errors %}
+                    {% for msg in form.document.errors %}
+                     <small class="text-danger">{{msg}}</small>
+                    {% endfor %}
+                    {% endif %}
+                </fieldset>
+
+
+              <hr>
+
+                   {{ form.csrf_token }}
+       <button type="submit" class="btn btn-success btn-rounded">Загрузить файл</button> <a href="{{url_for('reports')}}" class="btn btn-white btn-rounded">Отмена</a>
+
+
+
+
+            </div>
+          </div>
+
+        </div>
+
+
+
+               </div>
+
+
+</form>
+
+{% endblock %}
+

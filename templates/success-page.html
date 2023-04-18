@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+{% include "head.html" %}
+    <body>
+        
+        <!--================Header Menu Area =================-->
+        <header class="header_area">
+            <div class="main_menu">
+            	<nav class="navbar navbar-expand-lg navbar-light">
+					<div class="container box_1620">
+						<!-- Brand and toggle get grouped for better mobile display -->
+						<a class="navbar-brand logo_h" href="{{url_for('main')}}"><img src="{{url_for('static', filename='landing-new/img/logo-light.png')}}" alt=""></a>
+						<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+						</button>
+						<!-- Collect the nav links, forms, and other content for toggling -->
+						<div class="collapse navbar-collapse offset" id="navbarSupportedContent">
+							<ul class="nav navbar-nav menu_nav ml-auto">
+								<li class="nav-item"><a class="nav-link" href="{{url_for('support', branch=product.link)}}">Техническая поддержка</a></li>
+							</ul>
+						</div>
+					</div>
+            	</nav>
+            </div>
+        </header>
+        <!--================Header Menu Area =================-->
+        
+        <!--================Home Banner Area =================-->
+        <section class="home_banner_area">
+           	<div class="container box_1620">
+           		<div class="banner_inner d-flex align-items-center">
+					<div class="banner_content">
+						<div class="media">
+							<div class="d-flex">
+								{% if order.product.main_img %}
+								<img src="{{url_for('uploaded_file',landing_folder=order.product.link,filename=order.product.main_img)}}" style="max-width:740px; max-height:600px;" alt="">
+								{% else %}
+								<img src="{{url_for('static', filename='images/default-main-img.png')}}" style="max-width:740px; max-height:600px;" alt="">
+								{% endif %}
+							</div>
+							<div class="media-body">
+								<div class="personal_text">
+									<h6 class="text-center">Благодарим за покупку</h6>
+								</div>
+
+                            <div class="row">
+                 <p class="p text-justify text-dark mx-5 my-2">Для просмотра материалов продукта - воспользуйтесь кнопкой ниже</p>
+
+                 </div>
+								<div class="text-center">
+									<a href="{{url_for('check_order',hash=link)}}" class="genric-btn primary mt-2">Перейти к материалам</a></div>
+             <div class="row">
+                 <p class="p text-dark mx-5 my-2">Также, в течение 15 минут ссылка на все материалы придет на вашу почту <b>{{order.mail}}</b>, для того, чтобы Вы смогли воспользоваться ими позднее 😊</p>
+                      </div>
+             <div class="row">
+                 <p class="p text-dark mx-5 my-2">Если письма нет - проверьте папки Спам и Промоакции, возможно оно попало в них. Если письма нет и там - напишите в <a class="text-muted" href="{{url_for('support', branch=branch)}}"><u> службу технической поддержки</u></a></p>
+                 </div>
+
+
+
+
+
+
+
+
+							</div>
+						</div>
+					</div>
+				</div>
+            </div>
+        </section>
+        <!--================End Home Banner Area =================-->
+
+        <!--================End Welcome Area =================-->
+        
+
+
+
+{% include "footer.html" %}
+
+
+	    </body>
+</html>
+

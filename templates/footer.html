@@ -1,0 +1,57 @@
+<div class="footer">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="text-center">
+                           <p class="my-5">
+                                {% if product %}
+												<a href="{{url_for('support', branch=product.link)}}" >Техподдержка</a> | <a href="{{url_for('oferta_view')}}" >Пользовательское соглашение</a></p>
+					            {% else %}
+                            												<a href="{{url_for('support')}}" >Техподдержка</a> | <a href="{{url_for('oferta_view')}}" >Пользовательское соглашение</a></p>
+
+                                {% endif %}
+                            <p class="my-5">
+
+                                 Сделано в <a href="/" >inquick </a>&copy; <script>document.write(new Date().getFullYear())</script>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--================Footer Area =================-->
+
+
+        <!--================End Footer Area =================-->
+
+
+
+
+
+
+        <!-- Optional JavaScript -->
+        <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+        <script src="{{url_for('static', filename='landing-new/js/jquery-3.3.1.min.js')}}"></script>
+        <script src="{{url_for('static', filename='landing-new/js/popper.js')}}"></script>
+        <script src="{{url_for('static', filename='landing-new/js/bootstrap.min.js')}}"></script>
+        <script src="{{url_for('static', filename='landing-new/js/stellar.js')}}"></script>
+        <script src="{{url_for('static', filename='landing-new/js/jquery.ajaxchimp.min.js')}}"></script>
+<script>	function fontsize() {
+    let block = document.querySelector('.personal_text');
+    let text = document.querySelector('.personal_text .prod_name');
+    let w = block.offsetWidth;
+    prod_name.style.fontSize = w/14 + "px";
+}
+    window.onload = fontsize;
+    window.onresize = fontsize;
+</script>
+{% if confirm_order %}
+		<script>
+
+$( document ).ready(function() {
+    $('#confirmModal').modal('show');
+
+});
+</script>
+{% endif %}

@@ -1,0 +1,66 @@
+  <!-- jQuery -->
+  <script src="{{ url_for('static', filename='assets/vendor/jquery.min.js')}}"></script>
+
+
+  <!-- Bootstrap -->
+  <script src="{{ url_for('static', filename='assets/vendor/tether.min.js')}}"></script>
+  <script src="{{ url_for('static', filename='assets/vendor/bootstrap.min.js')}}"></script>
+
+  <!-- AdminPlus -->
+  <script src="{{ url_for('static', filename='assets/vendor/adminplus.js')}}"></script>
+
+  <!-- App JS -->
+  <script src="{{ url_for('static', filename='assets/js/main.min.js')}}"></script>
+
+  <!-- Theme Colors -->
+  <script src="{{ url_for('static', filename='assets/js/colors.js')}}"></script>
+
+  <!-- Charts JS -->
+  <script src="{{ url_for('static', filename='assets/vendor/raphael.min.js')}}"></script>
+  <script src="{{ url_for('static', filename='assets/vendor/morris.min.js')}}"></script>
+  <script src="{{ url_for('static', filename='assets/vendor/bootstrap-datepicker.min.js')}}"></script>
+  <script>
+
+$( document ).ready(function() {
+    change_fields();
+});
+
+    function readNotification(notification_id) {
+ $.get( "/private/read_notification", {"notification_id": notification_id});
+ }
+
+
+        $('#terms').click(function(){
+    if($(this).is(':checked')){
+
+        $('#submit_button').attr("disabled", false);
+    } else{
+
+        $('#submit_button').attr("disabled", true);
+    }
+});
+
+
+        $('#business_type').change(function(){
+    change_fields();
+
+});
+
+function change_fields() {
+    if($('#business_type').val()==1){
+    $('#company-fields').show();
+    $('#full-name-label').text('Наименование организации/ИП')
+    $('#bank-account-label').text('Расчетный счет')
+    $('#person-fields').hide();
+    } else{
+ $('#person-fields').show();
+ $('#full-name-label').text('ФИО физического лица')
+ $('#bank-account-label').text('Номер банковской карты')
+ $('#company-fields').hide();
+    }
+
+}
+
+ </script>
+
+

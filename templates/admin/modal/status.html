@@ -1,0 +1,55 @@
+<div class="modal fade" id="statusModal" aria-hidden="true" style="display: none;">
+                                        <div class="modal-dialog modal-dialog-centered" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Изменить статус</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal">
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <form id="state-form">
+                                                <button type="button" class="btn light btn-warning  btn-block mb-2 change-state" data-badge-class="control-buttons badge light badge-warning" data-state=0>Ожидание ответа</button>
+                                                <button type="button" class="btn light btn-dark btn-block mb-2 wait change-state" data-badge-class="control-buttons badge light badge-dark" data-state=1>Написать позднее</button>
+                                                <button type="button" class="btn light btn-success btn-block mb-2 change-state" data-badge-class="control-buttons badge light badge-success" data-state=2>Согласен</button>
+                                                <button type="button" class="btn light btn-danger btn-block mb-4 wait change-state" data-badge-class="control-buttons badge light badge-danger" data-state=3>Отказ</button>
+                                                    <input type="hidden" name="state-id" id="state-id">
+                                                <div class="notify-dialog p-2">
+                                                    <h4 class="mt-2">Создать напоминание?</h4>
+                                                    <p class="text-muted">Пришлем уведомлением в Телеграм</p>
+                                                      <div class="input-group">
+                                                           <span class="input-group-text"><i class="fa fa-calendar"></i></span>
+                                                    <input name="notify-date" class="datepicker-default form-control picker__input picker__input--active" id="notify-date" readonly="" aria-haspopup="true" aria-expanded="true" aria-readonly="false" aria-owns="datepicker_root">
+                                                      </div>
+                                                    <div class="input-group mt-2">
+                                                        <span class="input-group-text"><i class="fa fa-clock-o"></i></span>
+                                                        <input name="notify-time" type="text" class="form-control" value="09:00">
+                                                    </div>
+                                                </div>
+                                                <div class="agree-dialog p-2">
+                                                    <h4 class="mt-2">Отлично! Укажите даты прогрева и дату рекламного дня</h4>
+                                                    <p class="text-muted">Мы обязательно напомним вам накануне</p>
+                                                    <label class="mt-2">Выбрать дату прогрева</label>
+                                                     <div class="input-group">
+                                                         <span class="input-group-text"><i class="fa fa-calendar"></i></span>
+                                                        <input name="warm-day" class="datepicker-default form-control picker__input picker__input--active" id="warm-day" readonly="" aria-haspopup="true" aria-expanded="true" aria-readonly="false" aria-owns="datepicker_root">
+                                                     </div>
+                                                    <label class="mt-2">Выбрать рекламный день</label>
+                                                    <div class="input-group">
+                                                         <span class="input-group-text"><i class="fa fa-calendar"></i></span>
+                                                        <input name="adv-day" class="datepicker-default form-control picker__input picker__input--active" id="adv-day" readonly="" aria-haspopup="true" aria-expanded="true" aria-readonly="false" aria-owns="datepicker_root">
+                                                        </div>
+                                                </div>
+                                                <div class="cancel-dialog p-2">
+                                                    <h4 class="mt-2">Уточните причину отказа</h4>
+                                                    <p class="text-muted">Эта информация поможет вам в дальнейшем в аналитике работы с возражениями</p>
+                                                    <textarea name="cancel-reason" class="form-control" rows="4" style="height: auto;"></textarea>
+                                                </div>
+                                                </form>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-danger light" data-bs-dismiss="modal">Закрыть</button>
+                                                    <button type="button" id="state-save" class="btn btn-primary" data-bs-dismiss="modal">Сохранить</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>

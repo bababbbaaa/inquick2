@@ -1,0 +1,182 @@
+{% extends "base-admin.html" %}
+
+{% block container %}
+      <!-- Breadcrumb -->
+
+      <ol class="breadcrumb">
+        <li><a href="{{ url_for('dashboard')}}">Главная</a></li>
+        <li><a href="#">Продукты</a></li>
+      </ol>
+
+        <div class="jumbotron">
+        <p class="lead">В этом разделе отображаются все добавленные вами продукты. Для создания нового продукта нажмите на кнопку "Добавить продукт". Также в зависимости от своей роли здесь вы сможете отредактировать каждый отдельный продукт.</p>
+      </div>
+{% if user.role <= 2 %}
+<div class="center" style="margin-bottom: 20px;"><a href="{{url_for('add_product')}}"><button type="button" class="btn btn-primary btn-rounded"><span class="material-icons">add</span> Добавить продукт</button></a></div>
+
+{% endif %}
+<h2 class="left">Активные({{products|count}})</h2>
+<!-- Course -->
+{% for product in products|sort(attribute='id', reverse = True) %}
+{% if product.price == 0 or product.promo_price == 0  or not product.attachments %}
+ <div class="card card-stats-danger">
+{% else %}
+ <div class="card card-stats-success">
+{% endif %}
+
+     {% if user.role < 4 %}
+              <div class="card-button-wrapper">
+              <div class="dropdown">
+                <a href="#" class="card-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><i class="material-icons">more_vert</i></a>
+                <div class="dropdown-menu dropdown-menu-right">
+                    <a class="dropdown-item" href="{{url_for('edit_product', product_id=product.id, command='access')}}">Управление доступом</a>
+                    {% if user.role <= 2 %}
+                  <a class="dropdown-item" href="{{url_for('edit_product', product_id=product.id, command='edit')}}">Редактировать</a>
+                    {% if not product.archived %}
+                  <a class="dropdown-item" href="{{url_for('edit_product', product_id=product.id, command='archive')}}">Поместить в архив</a>
+                    {% else %}
+                    <a class="dropdown-item" href="{{url_for('edit_product', product_id=product.id, command='unarchive')}}">Извлечь из архива</a>
+                    {% endif %}
+                     {% endif %}
+                    {% if user.role < 1 %}
+                    {% if product.moderated %}
+                    <a class="dropdown-item" href="{{url_for('edit_product', product_id=product.id, command='disable')}}">Запретить публикацию</a>
+                    {% else %}
+                    <a class="dropdown-item" href="{{url_for('edit_product', product_id=product.id, command='enable')}}">Разрешить публикацию</a>
+                    {% endif %}
+                    {% endif %}
+                </div>
+              </div>
+            </div>
+     {% endif %}
+  <div class="card-block">
+     <div class="md">
+                <div class="md-left md-middle">
+                  {% if product.main_img %}
+
+          <img class="card" src="{{url_for('uploaded_file',landing_folder=product.link,filename=product.main_img)}}" style="max-height:180px;  max-width:269px;" alt="">
+
+      {% else %}
+      <img class="card" src="{{url_for('static', filename='images/default-main-img.png')}}" style="max-height:180px; max-width:269px;" alt="">
+      {% endif %}
+                     <strong class="p  text-primary">Цена {{product.price}} р / со скидкой {{product.promo_price}} р</strong>
+                </div>
+                <div class="md-body md-middle">
+                  <h4 class="card-title"><a href="{{url_for('edit_product', product_id=product.id, command='edit')}}" class="h5 card-title">{{product.content_info}} {{product.name}}</a></h4>
+
+
+      {% if product.commercial_name %}
+      <p class="card-subtitle">Автор: {{product.commercial_name}}</p>
+      {% endif %}
+
+                </div>
+                         <div class="md-right md-middle">
+                                 {% if  product.moderated %}
+                  <a href="{{url_for('shop', link=product.link)}}" class="text-muted" target="_blank"><span class="material-icons">login</span></a>
+                             {% endif %}
+                </div>
+              </div>
+
+
+
+
+
+
+      <hr>
+              <h5 class="card-title">Материалы продукта ({{product.attachments|count}})</h5>
+      <!-- Attachments -->
+
+      {% for attachment in product.attachments %}
+      <div class="btn-group">
+      <button type="button" class="btn btn-white btn-rounded-deep dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          {% if attachment.type=='link' %}
+          <span class="material-icons">public</span>
+          {% else %}
+          <span class="material-icons">attachment</span>
+          {% endif %}
+          {% if not attachment.description %}
+          {{attachment.content|truncate(20)}}
+          {% else %}
+          {{attachment.description|truncate(20)}}
+          {% endif %}
+      </button>
+
+          <div class="dropdown-menu">
+
+              <a class="dropdown-item" href="{{url_for('view_content', content_id=attachment.id)}}" target="_blank">{% if attachment.type=='link' %}Перейти{%else%}Скачать файл{% endif%}</a>
+               {% if user.role <= 2 %}
+              <a class="dropdown-item" href="{{url_for('edit_attachment', attachment_id=attachment.id, command='edit')}}">Изменить</a>
+              <a class="dropdown-item" href="{{url_for('edit_attachment', attachment_id=attachment.id, command='delete')}}">Удалить</a>
+              {% endif %}
+            </div>
+
+      </div>
+
+        {% endfor %}
+      {% if user.role <= 2 %}
+      <div class="btn-group">
+            <button type="button" class="btn btn-primary btn-rounded-deep dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="material-icons">add</span> Добавить материал</button>
+            <div class="dropdown-menu">
+              <a class="dropdown-item" href="{{url_for('add_attachment', product_id=product.id, a_type='file')}}">Загрузить файл</a>
+              <a class="dropdown-item" href="{{url_for('add_attachment', product_id=product.id, a_type='link')}}">Добавить ссылку</a>
+            </div>
+      </div>
+      {% endif %}
+      <hr>
+
+      {% if product.price == 0 or product.promo_price == 0 or not product.attachments%}
+ <div class="card card-red center">Продукт пока не опубликован, укажите цены и добавьте материалы, на которые необходимо предоставить доступ покупателю после оплаты</div>
+{% else %}
+      {% if product.moderated %}
+      <h5>Ссылка на продукт: <a href="{{url_for('shop', link=product.link, _external=True)}}">{{url_for('shop', link=product.link, _external=True)}}</a></h5>
+      {% if product.author.id == user.id %}
+ <div class="card card-primary center">Вы получите вознаграждение за каждую покупку без указания промокода либо с указанием вашего личного промокода <strong>{{user.promocode}}</strong></div>
+     {% else %}
+       <div class="card card-primary center">Вы получите вознаграждение за каждую покупку с указанием вашего личного промокода <strong>{{user.promocode}}</strong></div>
+      {% endif %}
+      {% else %}
+       <div class="card card-info center">Продукт ожидает модерации. После проверки он будет опубликован</div>
+      {% endif %}
+{% endif %}
+
+
+{% if user.role < 2 %}
+            <small class="card-text">Владелец: {{product.author.username}}</small>
+              <small class="card-text">Доступ ({{product.users|count}}): {% for u in product.users %}{% if u.username %} {{u.username}}({{roles.get(u.role)}}) {% endif %}{% endfor %}</small>
+      {% endif %}
+
+
+  </div></div>
+{% endfor %}
+
+<!-- End Attachents -->
+
+{% if user.role <= 2 %}
+<hr>
+
+<h2 class="left">Архив({{archived|count}})</h2>
+<!-- Course -->
+{% for product in archived|sort(attribute='id', reverse = True) %}
+ <div class="card card-stats-warning">
+              <div class="card-button-wrapper">
+              <div class="dropdown">
+                <a href="#" class="card-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><i class="material-icons">more_vert</i></a>
+                <div class="dropdown-menu dropdown-menu-right">
+                    <a class="dropdown-item" href="{{url_for('edit_product', product_id=product.id, command='access')}}">Управление доступом</a>
+                  <a class="dropdown-item" href="{{url_for('edit_product', product_id=product.id, command='edit')}}">Редактировать</a>
+                    {% if not product.archived %}
+                  <a class="dropdown-item" href="{{url_for('edit_product', product_id=product.id, command='archive')}}">Поместить в архив</a>
+                    {% else %}
+                    <a class="dropdown-item" href="{{url_for('edit_product', product_id=product.id, command='unarchive')}}">Извлечь из архива</a>
+                    {% endif %}
+                </div>
+              </div>
+            </div>
+  <div class="card-block">
+              <a href="{{url_for('edit_product', product_id=product.id, command='edit')}}" class="h5 card-title">{{product.name}}</a>
+  </div>
+ </div>
+{% endfor %}
+<!-- End Course -->
+{% endif %}
+{% endblock %}

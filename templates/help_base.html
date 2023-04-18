@@ -1,0 +1,109 @@
+{% extends "base-admin.html" %}
+
+{% block container %}
+
+      <ol class="breadcrumb">
+        <li><a href="{{url_for('dashboard')}}">Главная</a></li>
+        <li class="active">База знаний</li>
+      </ol>
+
+      <div class="row">
+        <div class="col-md-8">
+            {% if video %}
+          <div class="card">
+            <div class="card-block">
+              <h4 class="card-title">{{video.description}}</h4>
+
+              <hr>
+              <!-- 4:3 aspect ratio -->
+
+              <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/{{video.content}}" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen="" width="100%" height="600px"></iframe>
+               {% if video.text %}
+                <p>{{video.text}}</p>
+                 {% endif %}
+            </div>
+          </div>
+            {% endif %}
+          <!-- Lessons -->
+            <h3 class="center">Все материалы ({{videos.all()|count}})</h3>
+          <div class="card">
+            <div class="list-group list-group-fit">
+                {% for video in videos %}
+              <div class="list-group-item">
+                <div class="media">
+                  <div class="media-left">
+                    <div class="text-muted">{{loop.index}}</div>
+                  </div>
+                  <div class="media-body">
+                    <a href="{{url_for('help', v=video.content)}}">{{video.description}} </a>{% if user.role < 1 %} <small>(<a href="{{url_for('help', delete=video.content)}}">удалить</a>)</small>{% endif %}
+                  </div>
+                  <div class="media-right">
+                    <small class="text-muted-light">{{video.length}} </small>
+                  </div>
+                </div>
+              </div>
+                {% endfor %}
+
+
+
+
+
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+{% if user.role<2 %}
+          <div class="card">
+            <div class="card-block">Добавить материал
+              <hr>
+<form action="{{url_for('help')}}" method="POST">
+                <fieldset class="form-group">
+
+
+                    {{ form.content.label }}
+                    {{ form.content (class="form-control")}}
+
+                    {% if form.content.errors %}
+                    {% for msg in form.content.errors %}
+                     <small class="text-danger">{{msg}}</small>
+                    {% endfor %}
+                    {% endif %}
+
+                </fieldset>
+                  <fieldset class="form-group">
+                      {{ form.description.label }}
+                      {{ form.description (class="form-control")}}
+                                      {% if form.description.errors %}
+                    {% for msg in form.description.errors %}
+                     <small class="text-danger">{{msg}}</small>
+                    {% endfor %}
+                    {% endif %}
+                </fieldset>
+                                <fieldset class="form-group">
+                      {{ form.priority.label }}
+                      {{ form.priority (class="form-control")}}
+                                      {% if form.priority.errors %}
+                    {% for msg in form.priority.errors %}
+                     <small class="text-danger">{{msg}}</small>
+                    {% endfor %}
+                    {% endif %}
+                </fieldset>
+
+              <hr>
+
+
+
+
+                   {{ form.csrf_token }}
+       <button type="submit" class="btn btn-success btn-rounded">Добавить</button>
+
+
+</form>
+            </div>
+
+          </div>
+        </div>
+        {% endif %}
+      </div>
+
+{% endblock %}

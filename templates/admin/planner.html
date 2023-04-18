@@ -1,0 +1,113 @@
+{% extends "admin/index.html" %}
+
+
+{% block container %}
+<!--**********************************
+            Content body start
+        ***********************************-->
+<div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h4 class="card-title">Блогеры</h4>
+									<button type="button" class="btn btn-info">Добавить блогера <span class="btn-icon-end"><i class="fa fa-plus"></i></span>
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table id="planner-table" class="display" style="min-width: 845px">
+                                        <thead>
+                                            <tr>
+                                                 <th>Ник/имя</th>
+                                                <th>Продукт</th>
+                                                <th>Дата сообщения</th>
+
+                                                <th>Материал выдан</th>
+                                                <th>Статус</th>
+                                                <th>Комментарий</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                                 <tr>
+
+                                                <td>Алена Князева (@kniazeva_alena)</td>
+                                                <td>Детское меню(Алена Князева)</td>
+
+                                                <td><a href="javascript:void(0)" class="badge badge-rounded badge-outline-success" data-bs-toggle="modal" data-state=1 data-bloger-id=2 data-bs-target="#communicationsModal"><i class="fa fa-plus"></i></a></td>
+                                                <td><a href="javascript:void(0)" class="badge badge-rounded badge-outline-light control-buttons" data-bs-toggle="modal" data-state=5 data-bloger-id=2 data-bs-target="#questionModal">Нет</a></td>
+
+                                                <td><a href="#" class="control-buttons badge light badge-success" data-bs-toggle="modal" data-state=1 data-bloger-id=2 data-bs-target="#statusModal">Согласовано</a></td>
+                                                <td class="comment control-buttons" data-row-id="1" data-bloger-id=2 data-bs-toggle="modal" data-bs-target="#commentModal">Ожидание ответа</td>
+                                                <td>
+													<div class="dropdown">
+														<button type="button" class="btn btn-success light sharp" data-bs-toggle="dropdown" aria-expanded="false">
+															 <i class="fa fa-bell"></i>
+														</button>
+														<div class="dropdown-menu" style="margin: 0px;">
+															<a class="dropdown-item" href="#">Edit</a>
+															<a class="dropdown-item" href="#">Delete</a>
+														</div>
+													</div>
+												</td>
+                                            </tr>
+                                                <tr>
+
+                                                <td>Алена Князева (@kniazeva_alena) <i class="flaticon-381-link"></i></td>
+                                                <td>Детское меню(Алена Князева)</td>
+                                                <td><a href="javascript:void(0)" class="badge badge-rounded badge-outline-light">08-04-2023</a><a href="javascript:void(0)" class="badge badge-rounded badge-outline-light">08-04-2023</a><a href="javascript:void(0)" class="badge badge-rounded badge-outline-success">+</a></td>
+
+                                                <td>
+                                                    <a href="javascript:void(0)" class="badge badge-rounded badge-outline-light control-buttons">Нет</a>
+                                                </td>
+                                                <td><a class="control-buttons badge light badge-success" href="#" data-bs-toggle="modal" data-bs-target="#statusModal">Согласовано</a></td>
+                                                <td class="comment" data-row-id="1">Ждем решения блогера</td>
+                                                <td>
+													<div class="dropdown">
+														<button type="button" class="btn btn-success light sharp" data-bs-toggle="dropdown" aria-expanded="false">
+                                                            <i class="fa fa-bell"></i>
+														</button>
+														<div class="dropdown-menu" style="margin: 0px;">
+															<a class="dropdown-item" href="#">Edit</a>
+															<a class="dropdown-item" href="#">Delete</a>
+														</div>
+													</div>
+												</td>
+                                            </tr>
+                                            <tr>
+
+                                                <td>Алена Князева (@kniazeva_alena) <i class="flaticon-381-link"></i></td>
+                                                <td>Детское меню(Алена Князева)</td>
+                                                <td><a href="javascript:void(0)" class="badge badge-rounded badge-outline-success">+</a></td>
+
+                                                <td><a href="javascript:void(0)" class="badge badge-rounded badge-outline-light">Нет</a></td>
+                                                <td><a href="#" data-bs-toggle="modal" data-bs-target="#statusModal"><span class="badge light badge-success">Согласовано</span></a></td>
+                                                <td class="comment" data-row-id="1" data-bs-toggle="modal" data-bs-target="#commentModal">Ожидание ответа</td>
+                                                <td>
+													<div class="dropdown">
+														<button type="button" class="btn btn-success light sharp" data-bs-toggle="dropdown" aria-expanded="false">
+															 <i class="fa fa-bell"></i>
+														</button>
+														<div class="dropdown-menu" style="margin: 0px;">
+															<a class="dropdown-item" href="#">Edit</a>
+															<a class="dropdown-item" href="#">Delete</a>
+														</div>
+													</div>
+												</td>
+                                            </tr>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+
+
+
+{% endblock %}
+        <!--**********************************
+            Content body end
+        ***********************************-->

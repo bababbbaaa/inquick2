@@ -1,0 +1,99 @@
+{% extends "base-admin.html" %}
+
+{% block container %}
+      <!-- Breadcrumb -->
+      <ol class="breadcrumb">
+        <li><a href="{{ url_for('dashboard')}}">Главная</a></li>
+        <li><a href="#">Рефералы</a></li>
+      </ol>
+        <div class="jumbotron">
+        <p class="lead">Выберите уровень прав создаваемого реферала и создайте его.</p>
+      </div>
+{% if not referal %}
+<form action="{{url_for('add_referal')}}" method="POST">
+    {% else %}
+    <form action="{{url_for('edit_referal', referal_id=referal.id, command='edit')}}" method="POST">
+    {% endif %}
+      <div class="row">
+
+        <div class="col-md-6">
+          <div class="card">
+               <div class="card-block">
+              <h5>Создание реферала</h5>
+
+                <fieldset class="form-group">
+                    {{ form.promocode.label }}
+                    {% if referal %}
+                    {{ form.promocode (class="form-control", disabled=True)}}
+                    {% else %}
+                     {{ form.promocode (class="form-control")}}
+                    {% endif %}
+                                    {% if form.promocode.errors %}
+                    {% for msg in form.promocode.errors %}
+                     <small class="text-danger">{{msg}}</small>
+                    {% endfor %}
+                    {% endif %}
+                  <small class="text-help">Промокод должен состоять из букв латинского алфавита и (или) цифр</small>
+                </fieldset>
+                  <fieldset class="form-group">
+                      {{ form.role.label }}
+
+                      {{ form.role (class="form-control")}}
+
+                                      {% if form.role.errors %}
+                    {% for msg in form.role.errors %}
+                     <small class="text-danger">{{msg}}</small>
+                    {% endfor %}
+                    {% endif %}
+
+                </fieldset>
+                  <fieldset class="form-group">
+                      {{ form.proc.label }}
+                      {{ form.proc (class="form-control")}}
+                                      {% if form.proc.errors %}
+                    {% for msg in form.proc.errors %}
+                     <small class="text-danger">{{msg}}</small>
+                    {% endfor %}
+                    {% endif %}
+                  <small class="text-help">Размер вознаграждения реферала в % от суммы его продаж</small>
+                </fieldset>
+
+
+
+
+
+                   {{ form.csrf_token }}
+       <button type="submit" class="btn btn-success btn-rounded">Сохранить</button> <a href="{{url_for('referal')}}" class="btn btn-white btn-rounded">Отмена</a>
+
+
+
+
+            </div>
+          </div>
+
+        </div>
+                  <div class="col-md-6">
+          <div class="card">
+               <div class="card-block">
+                   <strong>Вы можете создавать приглашения для регистрации новых пользователей!</strong></br>
+                   <hr>
+
+                   <strong>Промокод</strong> создается при регистрации, в дальнейшем реферал сможет изменить его в личном кабинете. С этим промокодом покупатели продукта получат скидку, установленную в настройках продукта, такая продажа будет отображена в статистике продаж владельца промокода.<br> Промокод также является кодом приглашения для регистрации нового пользователя. Пользователь, зарегистрировавшийся по вашему коду приглашения становится вашим рефералом, вы будете видеть все его продажи.<br>
+                   Если установить права доступа <strong>Автор</strong>, то пользователь сможет создавать свои продукты.</br>
+                   <strong>Менеджер</strong> - приглашать Блогеров и предоставлять им доступ к продукту.<br>
+                   <strong>Блогер</strong> - только просматривать продукт, к которому ему предоставлен доступ и видеть статистику продаж по своему промокоду.<br>
+                   <hr>
+                   Процент вознаграждения - пока мы отключили автоматический расчет вознаграждений, вся финансовая информация будет предоставляться только в Отчетах, поэтому можете указать в этом поле любое значение.
+                   <hr>
+                   ВАЖНО! При создании реферала - ему не предоставляется доступ к вашим продуктам. Поэтому, после добавления реферала - зайдите в настройки доступа для каждого продукта, к которому нужно предоставить доступ и нажмите кнопку "Разрешить" в строке таблицы соответствующего пользователя.
+               </div>
+          </div>
+                  </div>
+
+      </div>
+
+
+</form>
+
+{% endblock %}
+

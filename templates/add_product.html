@@ -1,0 +1,95 @@
+{% extends "base-admin.html" %}
+
+{% block container %}
+      <!-- Breadcrumb -->
+      <ol class="breadcrumb">
+        <li><a href="{{ url_for('dashboard')}}">Главная</a></li>
+        <li><a href="{{ url_for('product')}}">Продукты</a></li>
+        <li class="active">Создание продукта</li>
+      </ol>
+
+        <div class="jumbotron">
+        <p class="lead">Придумайте название и адрес для страницы Вашего продукта</p>
+      </div>
+
+
+
+<form action="{{url_for('add_product')}}" method="POST">
+
+      <div class="row">
+
+        <div class="col-md-6">
+          <div class="card">
+               <div class="card-block">
+
+                   <fieldset class="form-group">
+                    {{ form.content_type.label }}
+                    {{ form.content_type (class="form-control",  list="typesOptions", placeholder="Укажите тип продукта")}}
+                       <datalist id="typesOptions">
+{% for type_name in form.content_types %}
+    <option value="{{type_name}}">{{type_name}}</option>
+{% endfor %}
+</datalist>
+                                    {% if form.content_type.errors %}
+                    {% for msg in form.content_type.errors %}
+                     <small class="text-danger">{{msg}}</small>
+                    {% endfor %}
+                    {% endif %}
+                  <small class="text-help">Что больше подходит для вашего проекта? Сбоник/курс/марафон/мастер-класс и т.д.</small>
+                </fieldset>
+
+                   <fieldset class="form-group ">
+
+                    {{ form.name.label }}
+                    {{ form.name (class="form-control",  placeholder="Коммерческое название")}}
+                                    {% if form.name.errors %}
+                    {% for msg in form.name.errors %}
+                     <small class="text-danger">{{msg}}</small>
+                    {% endfor %}
+                    {% endif %}
+                  <small class="text-help">Это название будет показываться покупателю</small>
+                </fieldset>
+
+<label class="form-control-label">Ссылка на страницу продукта</label>
+        <fieldset class="form-group row">
+                <div class="col-sm-3">
+                    {{ form.link (class="form-control",  placeholder="")}}
+                </div>
+                <div class="col-sm-9">
+                    {{ form.link.label (class="h4")}}
+                </div>
+                    {% if form.link.errors %}
+                    {% for msg in form.link.errors %}
+                     <small class="text-danger">{{msg}}</small>
+                    {% endfor %}
+                    {% endif %}
+        </fieldset>
+
+
+
+               </div>
+          </div>
+
+
+        </div>
+
+                  <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-block">
+                            <p>Сейчас мы создадим ваш новый продукт. Укажите название продукта, тип продукта и ссылку по которой покупатель сможет перейти на страницу лендинга о продукте.<br><br>Сразу после заполнения информации о продукте и загрузки материалов - вы сможете делиться этой ссылкой, прием платежей станет активен<br><br>После заполнения поля нажмите <strong>Далее</strong> для перехода к следующему шагу, где вы сможете заполнить остальную информацию</p>
+                        </div>
+                    </div>
+                  </div>
+
+      </div>
+   <div class="card">
+               <div class="card-block">
+                   <button type="submit" class="btn btn-success btn-rounded">Далее</button> <a href="{{url_for('product')}}" class="btn btn-white btn-rounded">Отмена</a>
+
+               </div>
+   </div>
+{{ form.csrf_token }}
+</form>
+
+{% endblock %}
+

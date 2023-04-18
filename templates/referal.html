@@ -1,0 +1,94 @@
+{% extends "base-admin.html" %}
+
+{% block container %}
+      <!-- Breadcrumb -->
+      <ol class="breadcrumb">
+        <li><a href="{{ url_for('dashboard')}}">Главная</a></li>
+        <li><a href="#">Рефералы</a></li>
+      </ol>
+
+
+        <div class="jumbotron">
+        <p class="lead">В этом разделе отображаются ваши рефералы. Для создания нового реферала нажмите на кнопку "Добавить реферала". Также вы можете переместить реферала в архив, для прекращения действия его промокода.</p>
+      </div>
+{% if user.role <= 4 %}
+<div class="center" style="margin-bottom: 20px;"><a href="{{url_for('add_referal')}}"><button type="button" class="btn btn-primary btn-rounded"><span class="material-icons">add</span> Добавить реферала</button></a></div>
+
+{% endif %}
+
+<h2 class="left">Активные({{referals|count}})</h2>
+{% for referal in referals|sort(attribute='id', reverse = True) %}
+{% if referal.blocked %}
+<div class="card card-stats-danger">
+{% else %}
+ <div class="card card-stats-success">
+{% endif%}
+
+              <div class="card-button-wrapper">
+              <div class="dropdown">
+                <a href="#" class="card-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><i class="material-icons">more_vert</i></a>
+                <div class="dropdown-menu dropdown-menu-right">
+                  <a class="dropdown-item" href="{{url_for('edit_referal', referal_id=referal.id, command='edit')}}">Редактировать</a>
+                    {% if not referal.archived %}
+                  <a class="dropdown-item" href="{{url_for('edit_referal', referal_id=referal.id, command='archive')}}">Поместить в архив</a>
+                    {% else %}
+                    <a class="dropdown-item" href="{{url_for('edit_referal', referal_id=referal.id, command='unarchive')}}">Извлечь из архива</a>
+                    {% endif %}
+                    {% if user.role < 1 %}
+                    <a class="dropdown-item" href="{{url_for('show_user_information', uid=referal.id)}}">Информация о пользователе</a>
+                    <a class="dropdown-item" href="{{url_for('reset_password_request', user_id=referal.id)}}">Сбросить пароль</a>
+                    <a class="dropdown-item" href="{{url_for('generate_password_request', user_id=referal.id)}}">Создать пароль</a>
+                    <a class="dropdown-item" href="{{url_for('change_mail_request', user_id=referal.id)}}">Изменить почту</a>
+                    {% if not referal.blocked %}
+                     <a class="dropdown-item" href="{{url_for('edit_referal', referal_id=referal.id, command='block')}}">Заблокировать пользователя</a>
+                    {% else %}
+                     <a class="dropdown-item" href="{{url_for('edit_referal', referal_id=referal.id, command='unblock')}}">Разблокировать пользователя</a>
+                    {% endif %}
+                    {% endif %}
+                </div>
+              </div>
+            </div>
+  <div class="card-block">
+                   {% if referal.username %}
+                 <a href="{{url_for('edit_referal', referal_id=referal.id, command='edit')}}" class="h5 card-title"> {{referal.username}}</a>
+              {% else %}
+      <p class="text-muted">Пользователь еще не зарегистрировался. Пригласите пользователя зарегистрироваться по ссылке: <a href="{{url_for('signup', inv=referal.promocode, _external=True)}}">{{url_for('signup', inv=referal.promocode, _external=True)}}</a></p>
+              {% endif %}
+              <p class="card-text">{{roles.get(referal.role)}}</p>
+      <hr>
+      
+      <p class="card-text">Промокод: {{referal.promocode}}</p>
+      
+  </div></div>
+{% endfor %}
+
+<hr>
+<h2 class="left">Архив({{archived|count}})</h2>
+<!-- Course -->
+{% for referal in archived %}
+ <div class="card card-stats-warning">
+              <div class="card-button-wrapper">
+              <div class="dropdown">
+                <a href="#" class="card-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><i class="material-icons">more_vert</i></a>
+                <div class="dropdown-menu dropdown-menu-right">
+                  <a class="dropdown-item" href="{{url_for('edit_referal', referal_id=referal.id, command='edit')}}">Редактировать</a>
+                    {% if not referal.archived %}
+                  <a class="dropdown-item" href="{{url_for('edit_referal', referal_id=referal.id, command='archive')}}">Поместить в архив</a>
+                    {% else %}
+                    <a class="dropdown-item" href="{{url_for('edit_referal', referal_id=referal.id, command='unarchive')}}">Извлечь из архива</a>
+                    {% endif %}
+                </div>
+              </div>
+            </div>
+  <div class="card-block">
+
+
+                  {% if referal.username %}
+                 <a href="{{url_for('edit_referal', referal_id=referal.id, command='edit')}}" class="h5 card-title"> {{referal.username}}</a>
+              {% else %}
+                 <a href="{{url_for('edit_referal', referal_id=referal.id, command='edit')}}" class="p text-muted">   Пользователь еще не зарегистрировался ({{referal.promocode}})</a>
+              {% endif %}
+
+  </div></div>
+{% endfor %}
+{% endblock %}

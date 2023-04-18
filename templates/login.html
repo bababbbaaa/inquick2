@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Войти</title>
+
+  <!-- Prevent the demo from appearing in search engines (REMOVE THIS) -->
+  <meta name="robots" content="noindex">
+
+  {% include "css.html" %}
+
+</head>
+
+<body class="login">
+
+
+    <div class="col-md-4 col-centered">
+      <h2 class="text-primary center m-a-2">
+        <i class="material-icons md-36">control_point</i> <span class="icon-text">InQuick</span>
+      </h2>
+
+        <div class="card bg-transparent">
+          <div class="card-block">
+            <div class="center">
+              <h4 class="m-b-0"><span class="icon-text">Войти</span></h4>
+              <p class="text-muted">в личный кабинет</p>
+            </div>
+            <form action="{{url_for('login')}}" method="POST">
+                   <div class="form-group">
+                                    {{ form.mail (class="form-control",  placeholder="Электронная почта")}}
+                                 {% if form.mail.errors %}
+                                    {% for msg in form.mail.errors %}
+                                     <small class="text-danger">{{msg}}</small>
+                                    {% endfor %}
+                                    {% endif %}
+
+              </div>
+               <div class="form-group">
+                                {{ form.password (class="form-control", placeholder="Пароль")}}
+                                 {% if form.password.errors %}
+                                    {% for msg in form.password.errors %}
+                                     <small class="text-danger">{{msg}}</small>
+                                    {% endfor %}
+                                    {% endif %}
+              </div>
+              {{ form.csrf_token }}
+              <div class="center">
+                <button type="submit" class="btn  btn-primary-outline btn-circle-large">
+                  <i class="material-icons">lock</i>
+                </button>
+                <div class="clearfix"></div>
+                             <a href="{{url_for('signup')}}" class="text-center">
+                  <small>Еще не зарегистрированы?</small>
+                </a>
+              </div>
+            </form>
+          </div>
+        </div>
+
+
+    </div>
+
+
+  {% include "js.html" %}
+
+</body>
+
+</html>

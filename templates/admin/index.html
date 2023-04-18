@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+	<!-- PAGE TITLE HERE -->
+	<title>Inquick - рабочий кабинет менеджера</title>
+	
+	<!-- FAVICONS ICON -->
+	<link rel="shortcut icon" type="image/png" href="{{url_for('static', filename='images/favicon.png')}}" />
+	
+	<link href="{{url_for('static', filename='vendor/jquery-nice-select/css/nice-select.css')}}" rel="stylesheet">
+	<link rel="stylesheet" href="{{url_for('static', filename='vendor/nouislider/nouislider.min.css')}}">
+	<link rel="stylesheet" href="{{url_for('static', filename='vendor/toastr/css/toastr.min.css')}}">
+	<!-- Style css -->
+    <link href="{{url_for('static', filename='css/style.css')}}" rel="stylesheet">
+	{% if 'calendar' in extensions %}
+	<link href="{{url_for('static', filename='vendor/fullcalendar/css/main.min.css')}}" rel="stylesheet">
+	{% endif %}
+	{% if 'templates' in extensions %}
+	<link href="{{url_for('static', filename='vendor/nestable2/css/jquery.nestable.min.css')}}" rel="stylesheet">
+	{% endif %}
+	{% if 'planner' in extensions %}
+	<link href="{{url_for('static', filename='vendor/datatables/css/jquery.dataTables.min.css')}}" rel="stylesheet">
+	<link rel="stylesheet" href="{{url_for('static', filename='vendor/pickadate/themes/default.css')}}">
+	<link rel="stylesheet" href="{{url_for('static', filename='vendor/pickadate/themes/default.date.css')}}">
+	{% endif %}
+	
+</head>
+<body>
+
+{% include 'additional/preloader.html' %}
+
+    <!--**********************************
+        Main wrapper start
+    ***********************************-->
+    <div id="main-wrapper">
+
+       {% include 'admin/header.html' %}
+		   <div class="content-body">
+            <!-- row -->
+			<div class="container-fluid">
+
+
+		{% block container %} {% endblock %}
+		 </div>
+        </div>
+		{% if 'planner' in extensions %}
+		{% include 'admin/modal/status.html' %}
+		{% include 'admin/modal/questions.html' %}
+		{% include 'admin/modal/communications.html' %}
+		{% include 'admin/modal/add-comment.html' %}
+		{% endif %}
+		{% if 'templates' in extensions %}
+		{% include 'admin/modal/add-template.html' %}
+		{% endif %}
+
+        <!--**********************************
+            Footer start
+        ***********************************-->
+        {% include 'admin/footer.html' %}
+        <!--**********************************
+            Footer end
+        ***********************************-->
+
+		
+
+
+	</div>
+    <!--**********************************
+        Main wrapper end
+    ***********************************-->
+
+    <!--**********************************
+        Scripts
+    ***********************************-->
+    <!-- Required vendors -->
+{% include 'script/admin-js.html' %}
+	
+    
+	
+</body>
+</html>

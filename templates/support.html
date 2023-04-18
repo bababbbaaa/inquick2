@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="format-detection" content="telephone=no">
+<title>ИНКВИК - сервис для монетизации контента</title>
+<meta name="author" content="INQUICK">
+<meta name="description" content="ИНКВИК (INQUICK) - сервис монетизации контента">
+<meta name="keywords" content="гайд, мастер-класс, конструктор сайтов, прием платежей">
+<!-- FAVICON FILES -->
+<link href="assets/images/icons/apple-touch-icon-144-precomposed.png" rel="apple-touch-icon" sizes="144x144">
+<link href="assets/images/icons/apple-touch-icon-120-precomposed.png" rel="apple-touch-icon" sizes="120x120">
+<link href="assets/images/icons/apple-touch-icon-76-precomposed.png" rel="apple-touch-icon" sizes="76x76">
+<link href="assets/images/icons/favicon.png" rel="shortcut icon">
+<!-- CSS FILES -->
+<link rel="stylesheet" href="{{url_for('static', filename='assets2/css/bootstrap.min.css')}}">
+<link rel="stylesheet" href="{{url_for('static', filename='assets2/fonts/iconfont.css')}}">
+<link rel="stylesheet" href="{{url_for('static', filename='assets2/css/plugins.css')}}">
+<link rel="stylesheet" href="{{url_for('static', filename='assets2/css/style.css')}}">
+<link rel="stylesheet" href="{{url_for('static', filename='assets2/css/responsive.css')}}">
+<link rel="stylesheet" href="{{url_for('static', filename='assets2/css/color.css')}}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.3/font/bootstrap-icons.css">
+</head>
+<body>
+<div id="dtr-wrapper" class="clearfix">
+
+    <!-- preloader starts -->
+    <div class="dtr-preloader">
+        <div class="dtr-preloader-inner">
+            <div class="dtr-loader">Загрузка...</div>
+        </div>
+    </div>
+    <!-- preloader ends -->
+
+    <!-- Small Devices Header
+============================================= -->
+    <div class="dtr-responsive-header header-with-slick-menu fixed-top">
+        <div class="container">
+
+            <!-- small devices logo -->
+            <div class="dtr-responsive-header-left"> <a href="{{url_for('main')}}" class="dtr-logo" ><img src="{{url_for('static', filename='images/logo-dark.png')}}" alt="logo"></a> </div>
+            <!-- small devices logo ends -->
+
+            <!-- menu button -->
+            <button id="dtr-menu-button" class="dtr-hamburger" type="button"><span class="dtr-hamburger-lines-wrapper"><span class="dtr-hamburger-lines"></span></span></button>
+        </div>
+        <div class="dtr-responsive-header-menu"></div>
+    </div>
+    <!-- Small Devices Header ends
+============================================= -->
+
+    <!-- header starts
+============================================= -->
+    <header id="dtr-header-global" class="fixed-top">
+        <div class="container">
+            <div class="d-flex align-items-center justify-content-between">
+
+                <!-- header left starts -->
+                <div class="dtr-header-left">
+
+                    <!-- logo -->
+                    <a class="logo-default dtr-scroll-link" href="{{url_for('main')}}"><img src="{{url_for('static', filename='images/logo-dark.png')}}" alt="logo"></a>
+
+                    <!-- logo on scroll -->
+                    <a class="logo-alt dtr-scroll-link" href="{{url_for('main')}}"><img src="{{url_for('static', filename='images/logo-dark.png')}}" alt="logo"></a>
+                    <!-- logo on scroll ends -->
+
+                </div>
+                <!-- header left ends -->
+
+                <!-- menu starts-->
+
+                <!-- menu ends -->
+
+            </div>
+        </div>
+    </header>
+    <!-- header ends
+================================================== -->
+
+    <!-- == main content area starts == -->
+    <div id="dtr-main-content">
+
+
+        <!-- contact section starts
+================================================== -->
+        <section id="contact" class="dtr-section dtr-py-100">
+            <div class="container">
+                {% if not get_flashed_messages() %}
+                <!-- heading starts -->
+                <div class="dtr-section-intro text-center dtr-mb-50">
+                    <div class="dtr-intro-subheading-wrapper">
+                        <p class="dtr-intro-subheading">{{header_text}}</p>
+                    </div>
+                    <p class="dtr-intro-content">{{p_text}} нашим телеграм-ботом <a href="https://t.me/inquicksupportbot">@inquicksupportbot</a></p>
+                </div>
+                <!-- heading ends -->
+                {% endif %}
+                <!--== row starts ==-->
+                <div class="row">
+
+                    <!-- column 1 starts -->
+                    <div class="col-12 col-md-10 offset-md-1">
+                        <div class="dtr-box-wrapper">
+                            <div class="dtr-box dtr-shadow">
+                                {% if get_flashed_messages() %}
+                                            <div id="contactresult" class="text-center mb-2">
+                                                <img src="{{url_for('static',filename='images/support-header.jpg')}}" style="max-width: 100%;">
+                                                                {% for message in get_flashed_messages() %}
+                                                                    {{ message }}
+                                                                    {% endfor %}
+                                            </div>
+                                                       <div id="backtohome" class="text-center"><a id="redirect_button" href="{{link_to_redirect}}">{{link_label}}</a></div>
+                                {% else %}
+                                <!-- form starts -->
+                                <form method="post" action="{{url_for('support', branch=branch)}}" autocomplete="off">
+                                    <fieldset>
+                                        <div class="dtr-form-row-2col">
+                                            <p class="dtr-form-column">
+                                                <label>Как вас зовут</label>
+                                                {{form.nmf(class="text-dark", placeholder="Укажите свое имя")}}
+                                                 {% if form.nmf.errors %}
+                                    {% for msg in form.nmf.errors %}
+                                     <small class="text-danger">{{msg}}</small>
+                                    {% endfor %}
+                                    {% endif %}
+                                            </p>
+
+                                            <p class="dtr-form-column">
+                                                <label>Электронная почта</label>
+                                                {{form.mail(placeholder="Электронная почта")}}
+                                                 {% if form.mail.errors %}
+                                    {% for msg in form.mail.errors %}
+                                     <small class="text-danger">{{msg}}</small>
+                                    {% endfor %}
+                                    {% endif %}
+
+                                            </p>
+
+                                        </div>
+                                        <p class="dtr-form-field">
+                                            <label>Сообщение</label>
+                                            {{form.message(placeholder="Сообщение", rows=5)}}
+                                               {% if form.message.errors %}
+                                    {% for msg in form.message.errors %}
+                                     <small class="text-danger">{{msg}}</small>
+                                    {% endfor %}
+                                    {% endif %}
+                                        </p>
+                                    {{ form.phone }}
+
+                                        <p class="text-end" style="margin-top: -40px; margin-right: 20px;">
+                                            <button onclick="document.getElementById('phone').value = 'an34249s';" class="dtr-btn" type="submit">Отправить</button>
+                                        </p>
+
+                                    </fieldset>
+
+                                    {{ form.csrf_token }}
+                                </form>
+                                <!-- form ends -->
+                                {% endif %}
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- column 1 ends -->
+
+                </div>
+                <!--== row ends ==-->
+
+            </div>
+        </section>
+        <!-- contact section ends
+================================================== -->
+
+    </div>
+    <!-- == main content area ends == -->
+
+    <!-- footer section starts
+================================================== -->
+    <footer id="dtr-footer">
+
+        <!--== main footer row starts ==-->
+        <div class="dtr-main-footer">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-3"><img src="{{url_for('static', filename='images/logo.png')}}" alt="logo"></a><p><small>2022 © Все права защищены</small></p></div>
+                <div class="col-md-3 mt-5"></div>
+                    <div class="col-md-3"><h6>Документы</h6>
+                        <p><a href="{{url_for('termsofuse_view')}}">Правила использования</a></p>
+                        <p><a href="{{url_for('privacy_view')}}">Персональные данные</a></p>
+                    </div>
+                    <div class="col-md-3"><small><h6>Связаться с нами</h6><a href="https://t.me/inquicksupportbot"><i class="bi bi-telegram dtr-mr-10 color-blue"></i>inquicksupportbot</a><p class="d-flex align-items-center"><i class="icon-envelope-simple-fill dtr-mr-10 color-blue"></i><a href="mailto:support@inquick.ru">support@inquick.ru</a></p></div>
+
+
+
+
+
+                </div>
+            </div>
+        </div>
+        <!--== main footer row ends ==-->
+
+
+
+    </footer>
+    <!-- footer section ends
+================================================== -->
+<!-- take top arrow -->
+<a id="take-to-top" href="#" class="dtr-fade-scroll "></a>
+</div>
+<!-- #dtr-wrapper ends -->
+<!-- Button trigger modal -->
+
+
+
+<!-- JS FILES -->
+<script src="{{url_for('static',filename='assets2/js/jquery.min.js')}}"></script>
+<script src="{{url_for('static',filename='assets2/js/bootstrap.min.js')}}"></script>
+<script src="{{url_for('static',filename='assets2/js/plugins.js')}}"></script>
+<script src="{{url_for('static',filename='assets2/js/slick.min.js')}}"></script>
+<script src="{{url_for('static',filename='assets2/js/custom.js')}}"></script>
+</body>
+</html>
