@@ -1755,6 +1755,7 @@ def render_server_error(error):
 @app.route('/admin/api/planner/communications', methods=['POST'])
 def edit_communication_date_handler():
     print(request.form)
+
     return [1, 'Все хорошо']
 
 
