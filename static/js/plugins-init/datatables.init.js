@@ -83,9 +83,20 @@
 		var table = $('#products-table').DataTable({
 	    ajax: $productTableEndpoint,
 	    columnDefs: [
+	         {render: function (data, type, row)
+                    {if (row[1] != 'https://' && row[1] != '') {
+                    return '<a target="_blank" href="'+row[1]+'">' + data +' <i class="fa fa-sign-in"></i></a>';
+                    }
+                    if (row[1] == 'https://') {
+                    return data;
+                    }
+                },
+               targets: 0 },
+               { visible: false, targets: [1] },
+
                { orderable: false,
                render: function (data, type) {
-                    return '<div class="dropdown ms-auto text-start"><div class="btn-link pointer-link" data-bs-toggle="dropdown" aria-expanded="false"><svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"></rect><circle fill="#000000" cx="5" cy="12" r="2"></circle><circle fill="#000000" cx="12" cy="12" r="2"></circle><circle fill="#000000" cx="19" cy="12" r="2"></circle></g></svg></div><div class="dropdown-menu dropdown-menu-start" style="margin: 0px;"><button  id="edit-product" class="dropdown-item control-buttons" data-uid=' + data + '><i class="fa fa-edit me-2"></i>Редактировать</button><button id="archive-expert" class="dropdown-item control-buttons" data-uid=' + data + '><i class="fa fa-archive me-2"></i>Убрать в архив</button></div></div>';
+                    return '<button  id="edit-product" class="d-inline control-buttons" data-uid=' + data + '><i class="fa fa-edit me-2"></i></button><button id="archive-expert" class="d-inline control-buttons" data-uid=' + data + '><i class="fa fa-archive me-2"></i></button>';
                 },
                targets: -1 },
                {render: function (data, type, row) {

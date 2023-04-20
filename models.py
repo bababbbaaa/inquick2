@@ -97,8 +97,18 @@ class Author(db.Model):
     created_by = db.Column(db.Integer)
     created_date = db.Column(db.DateTime)
     comment = db.Column(db.String)
+    commission_2 = db.Column(db.Integer)
 
-
+class Bloger(db.Model):
+    __tablename__ = 'blogers'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String)
+    link = db.Column(db.String)
+    created_by = db.Column(db.Integer)
+    products = db.relationship('Product', back_populates='blogers')
+    commission = db.Column(db.Integer)
+    created_date = db.Column(db.DateTime)
+    comment = db.Column(db.String)
 
 class Product(db.Model):
     __tablename__ = 'products'
@@ -111,6 +121,8 @@ class Product(db.Model):
     orders = db.relationship("Order")
     conversions = db.Column(db.Integer)
     archived = db.Column(db.Boolean)
+    bloger = db.relationship("Bloger")
+    bloger_id = db.Column(db.Integer, db.ForeignKey("blogers.id"))
     author = db.relationship("Author")
     author_id = db.Column(db.Integer, db.ForeignKey("authors.id"))
     user = db.relationship("User")
@@ -120,6 +132,8 @@ class Product(db.Model):
     real_product_id = db.Column(db.Integer, db.ForeignKey('products.id'))
     created_date = db.Column(db.DateTime)
     comment = db.Column(db.String)
+    commission_1 =db.Column(db.Integer)
+    commission_2 = db.Column(db.Integer)
 
 
     def get_users_ids(self):

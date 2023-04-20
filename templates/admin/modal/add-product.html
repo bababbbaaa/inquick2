@@ -3,11 +3,13 @@
                                             <div class="modal-content">
                                                 <div class="modal-header">
                                                     <h5 class="modal-title">Создать новый продукт</h5>
+
                                                     <button type="button" class="btn-close" data-bs-dismiss="modal">
                                                     </button>
                                                 </div>
                                                 <div class="modal-body">
                                                     <form id="product-form">
+                                                         <input type="hidden" name="uid" id="uid">
                                                    <div class="mb-3">
                                             <label class="mb-1"><strong>Эксперт</strong></label>
                                             <select id="expert-select" name="product-expert" class="form-control form-validate"></select>
@@ -29,6 +31,14 @@
                                         <div class="mb-3">
                                             <label class="mb-1">Цена со скидкой</label>
                                             <input type="number"  id="product-promo-price"  name="product-promo-price" class="form-control">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="mb-1">Размер комиссии менеджера</label>
+                                            <input type="number"  id="product-commission1"  name="product-promo-price" class="form-control">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="mb-1">Размер комиссии менеджера</label>
+                                            <input type="number"  id="product-commission2"  name="product-promo-price" class="form-control">
                                         </div>
                                         <div class="mb-3">
                                             <label class="mb-1"><strong>Комментарий</strong></label>

@@ -1604,19 +1604,19 @@ def logout_handler():
     return redirect(url_for('index_view'))
 
 
-@app.route('/admin/api/planner/communications', methods=['POST'])
+@app.route('/api/planner/communications', methods=['POST'])
 def edit_communication_date_handler():
     print(request.form)
 
     return jsonify([1, 'Все хорошо'])
 
-@app.route('/admin/api/bloger/edit', methods=['POST'])
+@app.route('/api/bloger/edit', methods=['POST'])
 def edit_bloger_handler():
     print(request.form)
 
     return jsonify([1, 'Все хорошо'])
 
-@app.route('/admin/api/expert/get', methods=['POST'])
+@app.route('/api/expert/get', methods=['POST'])
 @login_required
 def get_expert_handler():
     print(request.form)
@@ -1628,7 +1628,7 @@ def get_expert_handler():
 
     return jsonify({'name': '', 'commission': '', 'link': '', 'comment': ''})
 
-@app.route('/admin/api/product/get', methods=['POST'])
+@app.route('/api/product/get', methods=['POST'])
 @login_required
 def get_product_handler():
     print(request.form)
@@ -1640,7 +1640,7 @@ def get_product_handler():
 
     return jsonify({'author': '', 'author_name': '', 'name': '', 'promo-price': '', 'price': '', 'link': '', 'comment': ''})
 
-@app.route('/admin/api/product/edit', methods=['POST'])
+@app.route('/api/product/edit', methods=['POST'])
 def edit_product_handler():
     try:
         print(request.form)
@@ -1674,7 +1674,7 @@ def edit_product_handler():
     except Exception as e:
         return jsonify([0, f'Произошла ошибка, {e}'])
 
-@app.route('/admin/api/expert/edit', methods=['POST'])
+@app.route('/api/expert/edit', methods=['POST'])
 def edit_expert_handler():
     try:
         print(request.form)
@@ -1705,7 +1705,7 @@ def edit_expert_handler():
     except Exception as e:
         return jsonify([0, f'Произошла ошибка, {e}'])
 
-@app.route('/admin/api/experts/table', methods=['GET'])
+@app.route('/api/experts/table', methods=['GET'])
 @login_required
 def experts_table_handler():
     #user_authors = db.session.query(Author).filter(Author.created_by==session['user']['id']).delete()
@@ -1718,7 +1718,7 @@ def experts_table_handler():
 
     return jsonify({"data": authors})
 
-@app.route('/admin/api/experts/list')
+@app.route('/api/experts/list')
 @login_required
 def experts_list_handler():
     user_authors = db.session.query(Author).filter(Author.created_by == session['user']['id']).all()
@@ -1727,7 +1727,17 @@ def experts_list_handler():
         lst.append({'text': author.name, 'id':author.id})
     return jsonify({'results':lst})
 
-@app.route('/admin/api/products/table', methods=['GET'])
+@app.route('/api/products/list')
+@login_required
+def products_list_handler():
+    products = db.session.query(Product).filter(Product.created_by == session['user']['id']).all()
+    lst = []
+    for product in products:
+        lst.append({'text': f'{product.name} ({product.author.name})' , 'id':product.id})
+    return jsonify({'results':lst})
+
+
+@app.route('/api/products/table', methods=['GET'])
 @login_required
 def products_table_handler():
     #user_authors = db.session.query(Author).filter(Author.created_by==session['user']['id']).delete()
@@ -1739,13 +1749,13 @@ def products_table_handler():
 
     return jsonify({"data": products_out})
 
-@app.route('/admin/api/planner/states', methods=['POST'])
+@app.route('/api/planner/states', methods=['POST'])
 def change_state_handler():
     print(request.form)
     return jsonify([1, 'Все хорошо'])
 
 
-@app.route('/admin/api/planner/comment/get', methods=['POST'])
+@app.route('/api/planner/comment/get', methods=['POST'])
 def get_comment_handler():
     try:
         print(request.form)
@@ -1754,7 +1764,7 @@ def get_comment_handler():
         return jsonify([0, f'Произошла ошибка {e}'])
 
 
-@app.route('/admin/api/planner/comment', methods=['POST'])
+@app.route('/api/planner/comment', methods=['POST'])
 def edit_comment_handler():
     try:
 
@@ -1763,7 +1773,7 @@ def edit_comment_handler():
     except Exception as e:
         return jsonify([0, f'Произошла ошибка {e}'])
 
-@app.route('/admin/api/planner/contentaccess', methods=['POST'])
+@app.route('/api/planner/contentaccess', methods=['POST'])
 def content_access_handler():
     print(request.form)
     return [1, 'Изменения сохранены']
