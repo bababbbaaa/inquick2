@@ -1,0 +1,22 @@
+{% extends "base/index.html" %}
+
+{% block container %}
+
+<body class="vh-100">
+    <div class="authincation h-100">
+        <div class="container h-100">
+            <div class="row justify-content-center h-100 align-items-center">
+                <div class="col-md-5">
+                    <div class="form-input-content text-center error-page">
+                        <h1 class="error-text fw-bold">{{error}}</h1>
+                        <h4><i class="fa fa-thumbs-down text-danger"></i> Произошла ошибка</h4>
+                        <p>Не удалось найти запрошенную страницу</p>
+						<div>
+                            <a class="btn btn-primary" href="{{url_for('index_view')}}">На главную</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endblock %}

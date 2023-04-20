@@ -7,27 +7,29 @@
 
 	<!-- PAGE TITLE HERE -->
 	<title>Inquick - рабочий кабинет менеджера</title>
-	
+
 	<!-- FAVICONS ICON -->
 	<link rel="shortcut icon" type="image/png" href="{{url_for('static', filename='images/favicon.png')}}" />
-	
+
 	<link href="{{url_for('static', filename='vendor/jquery-nice-select/css/nice-select.css')}}" rel="stylesheet">
 	<link rel="stylesheet" href="{{url_for('static', filename='vendor/nouislider/nouislider.min.css')}}">
 	<link rel="stylesheet" href="{{url_for('static', filename='vendor/toastr/css/toastr.min.css')}}">
 	<!-- Style css -->
     <link href="{{url_for('static', filename='css/style.css')}}" rel="stylesheet">
+	<link href="{{url_for('static', filename='css/custom.css')}}" rel="stylesheet">
 	{% if 'calendar' in extensions %}
 	<link href="{{url_for('static', filename='vendor/fullcalendar/css/main.min.css')}}" rel="stylesheet">
 	{% endif %}
 	{% if 'templates' in extensions %}
 	<link href="{{url_for('static', filename='vendor/nestable2/css/jquery.nestable.min.css')}}" rel="stylesheet">
 	{% endif %}
-	{% if 'planner' in extensions %}
+	{% if 'planner' in extensions or 'products' in extensions or 'experts' in extensions %}
 	<link href="{{url_for('static', filename='vendor/datatables/css/jquery.dataTables.min.css')}}" rel="stylesheet">
 	<link rel="stylesheet" href="{{url_for('static', filename='vendor/pickadate/themes/default.css')}}">
 	<link rel="stylesheet" href="{{url_for('static', filename='vendor/pickadate/themes/default.date.css')}}">
+	<link rel="stylesheet" href="{{url_for('static', filename='vendor/select2/css/select2.min.css')}}">
 	{% endif %}
-	
+
 </head>
 <body>
 
@@ -48,14 +50,22 @@
 		 </div>
         </div>
 		{% if 'planner' in extensions %}
-		{% include 'admin/modal/status.html' %}
-		{% include 'admin/modal/questions.html' %}
-		{% include 'admin/modal/communications.html' %}
-		{% include 'admin/modal/add-comment.html' %}
+			{% include 'admin/modal/status.html' %}
+			{% include 'admin/modal/questions.html' %}
+			{% include 'admin/modal/communications.html' %}
+			{% include 'admin/modal/add-comment.html' %}
+			{% include 'admin/modal/add-bloger.html' %}
 		{% endif %}
 		{% if 'templates' in extensions %}
-		{% include 'admin/modal/add-template.html' %}
+			{% include 'admin/modal/add-template.html' %}
 		{% endif %}
+		{% if 'experts' in extensions %}
+			{% include 'admin/modal/add-expert.html' %}
+		{% endif %}
+		{% if 'products' in extensions %}
+			{% include 'admin/modal/add-product.html' %}
+		{% endif %}
+
 
         <!--**********************************
             Footer start

@@ -1,91 +1,77 @@
     <script>
-		var $changeStateEndpoint = '{{url_for('change_state_handler')}}'
-		var $contentAccessEndpoint = '{{url_for('content_access_handler')}}'
-		var $getCommentEndpoint = '{{url_for('get_comment_handler')}}'
-		var $editCommentEndpoint = '{{url_for('edit_comment_handler')}}'
-		var $editCommunicationDateEndpoint = '{{url_for('edit_communication_date_handler')}}'
-		var fullDate = new Date()
+		var $changeStateEndpoint = '{{url_for('change_state_handler')}}';
+		var $contentAccessEndpoint = '{{url_for('content_access_handler')}}';
+		var $getCommentEndpoint = '{{url_for('get_comment_handler')}}';
+		var $editCommentEndpoint = '{{url_for('edit_comment_handler')}}';
+		var $editCommunicationDateEndpoint = '{{url_for('edit_communication_date_handler')}}';
+		var $editBlogerEndpoint = '{{url_for('edit_bloger_handler')}}';
+		var $editExpertEndpoint = '{{url_for('edit_expert_handler')}}';
+		var $getExpertEndpoint = '{{url_for('get_expert_handler')}}';
+		var $getAuthorsEndpoint = '{{url_for('experts_list_handler')}}';
+		var $expertTableEndpoint = '{{url_for('experts_table_handler')}}';
+		var $productTableEndpoint = '{{url_for('products_table_handler')}}';
+		var $editProductEndpoint = '{{url_for('edit_product_handler')}}';
+		var fullDate = new Date();
 		var twoDigitMonth = ((fullDate.getMonth().length+1) === 1)? (fullDate.getMonth()+1) : '0' + (fullDate.getMonth()+1);
 		var currentDate = fullDate.getDate() + "-" + twoDigitMonth + "-" + fullDate.getFullYear();
+
 	</script>
 	<script src="{{url_for('static', filename='vendor/global/global.min.js')}}"></script>
 	<script src="{{url_for('static', filename='vendor/chart.js/Chart.bundle.min.js')}}"></script>
 	<script src="{{url_for('static', filename='vendor/jquery-nice-select/js/jquery.nice-select.min.js')}}"></script>
 	<script src="{{url_for('static', filename='vendor/toastr/js/toastr.min.js')}}"></script>
 	<script>
-	function ErrorMessageSend (message, title) {
-		toastr.error(message, title, {
-                positionClass: "toast-top-full-width",
-                timeOut: 5e3,
-                closeButton: !0,
-                debug: !1,
-                newestOnTop: !0,
-                progressBar: !0,
-                preventDuplicates: !0,
-                onclick: null,
-                showDuration: "300",
-                hideDuration: "1000",
-                extendedTimeOut: "1000",
-                showEasing: "swing",
-                hideEasing: "linear",
-                showMethod: "fadeIn",
-                hideMethod: "fadeOut",
-                tapToDismiss: !1
-            	})
-            }
-		    function SuccessMessageSend (message, title) {
-                toastr.success(message, title, {
-                    positionClass: "toast-top-full-width",
-                    timeOut: 5e3,
-                    closeButton: !0,
-                    debug: !1,
-                    newestOnTop: !0,
-                    progressBar: !0,
-                    preventDuplicates: !0,
-                    onclick: null,
-                    showDuration: "300",
-                    hideDuration: "1000",
-                    extendedTimeOut: "1000",
-                    showEasing: "swing",
-                    hideEasing: "linear",
-                    showMethod: "fadeIn",
-                    hideMethod: "fadeOut",
-                    tapToDismiss: !1
-                })
-            }
-
+		$(".form-control").on('change blur keypress', function(e) {
+		 $(this).removeClass("is-invalid");
+		 $(this).prev().removeClass("is-invalid");
+     	});
+		{% include 'script/notifications.html' %}
+		{% with messages = get_flashed_messages() %}
+		{% if messages %}
+		{% for message in messages %}
+			{% if message[0] == 1 %}
+			SuccessMessageSend(message[1], 'Готово');
+			{% endif %}
+			{% if message[0] == 0 %}
+			ErrorMessageSend(message[1], 'Произошла ошибка');
+			{% endif %}
+		{% endfor %}
+		{% endif %}
+		{% endwith %}
 	</script>
 	{% if 'dashboard' in extensions %}
-	<!-- Apex Chart -->
-	<script src="{{url_for('static', filename='vendor/apexchart/apexchart.js')}}"></script>
-	<script src="{{url_for('static', filename='vendor/nouislider/nouislider.min.js')}}"></script>
-	<script src="{{url_for('static', filename='vendor/wnumb/wNumb.js')}}"></script>
-	<!-- Dashboard 1 -->
-
-	<script src="{{url_for('static', filename='js/dashboard/dashboard-1.js')}}"></script>
+		<script src="{{url_for('static', filename='vendor/apexchart/apexchart.js')}}"></script>
+		<script src="{{url_for('static', filename='vendor/nouislider/nouislider.min.js')}}"></script>
+		<script src="{{url_for('static', filename='vendor/wnumb/wNumb.js')}}"></script>
+		<script src="{{url_for('static', filename='js/dashboard/dashboard-1.js')}}"></script>
+	{% endif %}
+	{% if 'planner' in extensions or 'products' in extensions or 'experts' in extensions%}
+		<script src="{{url_for('static', filename='vendor/datatables/js/jquery.dataTables.min.js')}}"></script>
+		<script src="{{url_for('static', filename='js/plugins-init/datatables.init.js')}}"></script>
+		<script src="{{url_for('static', filename='vendor/select2/js/select2.full.min.js')}}"></script>
 	{% endif %}
 	{% if 'planner' in extensions %}
-	<script src="{{url_for('static', filename='vendor/datatables/js/jquery.dataTables.min.js')}}"></script>
-	<script src="{{url_for('static', filename='js/plugins-init/datatables.init.js')}}"></script>
-	<script src="{{url_for('static', filename='js/planner.js')}}"></script>
-	<script src="{{url_for('static', filename='vendor/pickadate/picker.js')}}"></script>
-	<script src="{{url_for('static', filename='vendor/pickadate/picker.date.js')}}"></script>
-	<script src="{{url_for('static', filename='vendor/pickadate/translations/ru_RU.js')}}"></script>
-	<script src="{{url_for('static', filename='js/plugins-init/pickadate-init.js')}}"></script>
+		<script src="{{url_for('static', filename='vendor/pickadate/picker.js')}}"></script>
+		<script src="{{url_for('static', filename='vendor/pickadate/picker.date.js')}}"></script>
+		<script src="{{url_for('static', filename='vendor/pickadate/translations/ru_RU.js')}}"></script>
+		<script src="{{url_for('static', filename='js/plugins-init/pickadate-init.js')}}"></script>
+		<script src="{{url_for('static', filename='js/planner.js')}}"></script>
 	{% endif %}
-
-    <script src="{{url_for('static', filename='js/custom.min.js')}}"></script>
-	<script src="{{url_for('static', filename='js/dlabnav-init.js')}}"></script>
-
-
+	{% if 'experts' in extensions %}
+		<script src="{{url_for('static', filename='js/experts.js')}}"></script>
+	{% endif %}
+	{% if 'products' in extensions %}
+		<script src="{{url_for('static', filename='js/products.js')}}"></script>
+	{% endif %}
+		<script src="{{url_for('static', filename='js/custom.min.js')}}"></script>
+		<script src="{{url_for('static', filename='js/dlabnav-init.js')}}"></script>
 	{% if 'calendar' in extensions %}
-
-	<script>
-		var todayDate = "{{todayDate}}";
-		var plannerEvents ={{plannerEvents | tojson | safe}};
-	</script>
-	<script src="{{url_for('static', filename='vendor/fullcalendar/js/main.min.js')}}"></script>
-	<script src="{{url_for('static', filename='js/plugins-init/fullcalendar-init.js')}}"></script>
+		<script>
+			var todayDate = "{{todayDate}}";
+			var plannerEvents ={{plannerEvents | tojson | safe}};
+		</script>
+		<script src="{{url_for('static', filename='vendor/fullcalendar/js/main.min.js')}}"></script>
+		<script src="{{url_for('static', filename='js/plugins-init/fullcalendar-init.js')}}"></script>
 	{% endif %}
 
 	{% if 'templates' in extensions %}

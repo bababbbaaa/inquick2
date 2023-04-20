@@ -2,7 +2,6 @@
 import re
 from flask_wtf import FlaskForm
 from wtforms import StringField, HiddenField, PasswordField, TextAreaField, SelectField, DateField, HiddenField
-from flask_wtf.file import FileField, FileRequired, FileAllowed, FileSize
 from wtforms.validators import DataRequired, Length, ValidationError
 from config import roles, notification_level
 
@@ -87,8 +86,6 @@ class ProductForm(FlaskForm):
     promoprice = StringField('Цена после скидки',validators=[price_check])
     thankyoutext = TextAreaField('Cообщение покупателю после покупки')
     author = StringField('Начните вводить логин/промокод/почту автора',validators=[DataRequired()])
-    author_avatar = FileField('Загрузить аватар автора',validators=[FileAllowed(['jpg', 'jpeg', 'png'],message='Недопустимый формат файла. Загрузите файл в разрешенном формате (.jpg, .jpeg, .png). Если вам требуется загрузить файл в другом формате - пожалуйста обратитесь в службу поддержки.'), FileSize(max_size=7*1024*1024, message='Большой размер файла, уменьшите файл в графическом редакторе, либо обратитесь в службу поддержки')])
-    main_img = FileField('Загрузить баннер продукта',validators=[FileAllowed(['jpg', 'jpeg', 'png'],message='Недопустимый формат файла. Загрузите файл в разрешенном формате (.jpg, .jpeg, .png). Если вам требуется загрузить файл в другом формате - пожалуйста обратитесь в службу поддержки.'), FileSize(max_size=7*1024*1024, message='Большой размер файла, уменьшите файл в графическом редакторе, либо обратитесь в службу поддержки')])
     only_button = SelectField('Только кнопка для встраивания в свой сайт',choices=[(0, 'Да'), (1, 'Нет')],default=1)
 
 
@@ -99,10 +96,6 @@ class AddProductForm(FlaskForm):
     content_type = StringField('Тип продукта', validators=[Length(min=2,max=50, message='Тип продукта должен быть не менее 2 и не более 50 символов'),DataRequired()])
     content_types = ['Курс', 'Гайд', 'Марафон']
 
-
-class FileForm(FlaskForm):
-    description = StringField('Название материала')
-    content = FileField('Выберите файл',validators=[FileAllowed(['txt', 'doc', 'docx', 'ppt','pdf','xlsx','xls'],message='Недопустимый формат файла. Загрузите файл в разрешенном формате (.txt, .doc, .docx, .pdf, .ppt, .xls, .xlsx). Если вам требуется загрузить файл в другом формате - пожалуйста обратитесь в службу поддержки.'), FileRequired(message='Пожалуйста выберите файл для загрузки'), FileSize(max_size=40*1024*1024, message='Большой размер файла, мы рекомендуем загружать файлы размером более 20мб на внешние ресурсы (например, видео - на Youtube и ограничивать доступ по ссылке, илли на Google Drive), и добавлять материал на платформу не в виде файла а в виде ссылки на внешний источник ')])
 
 
 class LinkForm(FlaskForm):
@@ -184,7 +177,3 @@ class ContactForm(FlaskForm):
 class AnswerTicketForm(FlaskForm):
     message = TextAreaField('Сообщение')
 
-class AddDocumentForm(FlaskForm):
-    name = StringField('Название документа')
-    recipient = StringField('Получатель',validators=[DataRequired()])
-    document = FileField('Выберите файл',validators=[FileAllowed(['txt', 'doc', 'docx','pdf','xlsx','xls'],message='Недопустимый формат файла. Загрузите файл в разрешенном формате (.txt, .doc, .docx, .pdf, .xls, .xlsx). Если вам требуется загрузить файл в другом формате - пожалуйста обратитесь в службу поддержки.'), FileRequired(message='Пожалуйста выберите файл для загрузки'), FileSize(max_size=20*1024*1024, message='Большой размер файла, мы рекомендуем загружать файлы размером более 20мб на внешние ресурсы (например, видео - на Youtube и ограничивать доступ по ссылке, илли на Google Drive), и добавлять материал на платформу не в виде файла а в виде ссылки на внешний источник ')])

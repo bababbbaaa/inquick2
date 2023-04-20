@@ -1,0 +1,42 @@
+<div class="modal fade" id="expertModal" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static" style="display: none;">
+                                        <div class="modal-dialog modal-dialog-centered" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Добавить эксперта</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal">
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <form id="expert-form">
+                                                        <input type="hidden" name="uid" id="uid">
+                                                         <h4 class="mb-3">Заполните информацию об эксперте</h4>
+                                                        <div class="mb-3">
+                                                            <label class="mb-1">Имя/ник эксперта</label>
+                                                            <input type="text" name="expert-name" id="expert-name" class="form-control form-validate" placeholder="">
+                                                             <div class="invalid-feedback">Это поле обязательно для заполнения</div>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label class="mb-1">Ссылка на профиль</label>
+                                                            <input type="text" name="expert-link"  id="expert-link" class="form-control" placeholder="https://">
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label class="mb-1">Размер вознаграждения (%)</label>
+                                                            <input type="text" name="expert-commission" id="expert-commission"  class="form-control">
+                                                        </div>
+
+
+                                                    <div class="mb-3">
+                                            <label class="mb-1">Комментарий</label>
+                                            <textarea name="expert-comment" id="expert-comment"  class="form-control" rows="5" style="height: auto;"></textarea>
+
+                                        </div>
+
+                                        </form>
+                                        </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-danger light" data-bs-dismiss="modal">Закрыть</button>
+                                                    <button id="save-expert" class="btn btn-success"><i class="fa fa-plus me-2 expert-save-icon"></i><span id="save-expert-text">Добавить</span></button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>

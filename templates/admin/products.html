@@ -8,43 +8,40 @@
 <div class="col-12">
                         <div class="card">
                             <div class="card-header">
-                                <h4 class="card-title">Блогеры</h4>
-									<button data-bs-toggle="modal" data-bs-target="#blogerModal" type="button" class="btn btn-info">Добавить блогера <span class="btn-icon-end"><i class="fa fa-plus"></i></span>
+                                <h4 class="card-title">Продукты</h4>
+									<button data-bs-toggle="modal" data-bs-target="#productModal" type="button" class="btn btn-info">Добавить продукт <span class="btn-icon-end"><i class="fa fa-plus"></i></span>
                                 </button>
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive">
-                                    <table id="planner-table" class="display" style="min-width: 845px">
+                                    <table id="products-table" class="display" style="min-width: 845px">
                                         <thead>
                                             <tr>
-                                                 <th>Ник/имя</th>
-                                                <th>Продукт</th>
-                                                <th>Дата сообщения</th>
 
-                                                <th>Материал выдан</th>
-                                                <th>Статус</th>
+                                                <th>Наименование</th>
+                                                <th>Ссылка на продукт</th>
+                                                <th>Автор</th>
+                                                <th>Цена</th>
                                                 <th>Комментарий</th>
+                                                <th>Добавлено</th>
                                                 <th></th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                                  <tr>
 
-                                                <td>Алена Князева (@kniazeva_alena)</td>
-                                                <td>Детское меню(Алена Князева)</td>
-
-                                                <td><a href="javascript:void(0)" class="badge badge-rounded badge-outline-success control-buttons" data-bs-toggle="modal" data-state=1 data-bloger-id=2 data-bs-target="#communicationsModal"><i class="fa fa-plus"></i></a></td>
-                                                <td><a href="javascript:void(0)" class="badge badge-rounded badge-outline-light control-buttons" data-bs-toggle="modal" data-state=5 data-bloger-id=2 data-bs-target="#questionModal">Нет</a></td>
-
-                                                <td><a href="#" class="control-buttons badge light badge-success" data-bs-toggle="modal" data-state=1 data-bloger-id=2 data-bs-target="#statusModal">Согласовано</a></td>
-                                                <td class="comment control-buttons" data-row-id="1" data-bloger-id=2 data-bs-toggle="modal" data-bs-target="#commentModal">Ожидание ответа</td>
+                                                <td>Детское меню</td>
+                                                <td>https://www.alenakniazeva.ru</td>
+                                                <td><a href="#">Алена Князева</a></td>
+                                                     <td>Договорились о сотрудничестве</td>
+                                                     <td>12-05-2023</td>
                                                 <td>
 													<div class="dropdown ms-auto text-start">
 														<div class="btn-link pointer-link" data-bs-toggle="dropdown" aria-expanded="false">
 															<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"></rect><circle fill="#000000" cx="5" cy="12" r="2"></circle><circle fill="#000000" cx="12" cy="12" r="2"></circle><circle fill="#000000" cx="19" cy="12" r="2"></circle></g></svg>
 														</div>
 														<div class="dropdown-menu dropdown-menu-start" style="margin: 0px;">
-															<a class="dropdown-item" href="#"><i class="fa fa-bell me-2"></i>Уведомления</a>
+															<a class="dropdown-item" href="#"><i class="fa fa-edit me-2"></i>Редактировать</a>
 															<a class="dropdown-item" href="#"><i class="fa fa-archive me-2"></i>Убрать в архив</a>
 														</div>
 													</div>

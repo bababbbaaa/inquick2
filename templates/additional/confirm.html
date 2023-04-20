@@ -1,0 +1,39 @@
+{% extends "base/index.html" %}
+
+{% block container %}
+    <div class="authincation h-100">
+        <div class="container h-100">
+            <div class="row justify-content-center h-100 align-items-center">
+                <div class="col-md-6">
+                    <div class="authincation-content">
+                        <div class="row no-gutters">
+                            <div class="col-xl-12">
+                                <div class="auth-form">
+									<div class="text-center mb-3">
+										<a href="{{url_for('index_view')}}"><img width="200px" src="{{url_for('static', filename='images/inquick.png')}}" alt=""></a>
+									</div>
+                                                      <div class="alert alert-primary left-icon-big alert-dismissible fade show">
+
+                                            <div class="media">
+                                                <div class="alert-left-icon-big">
+                                                    <span><i class="mdi mdi-email-alert"></i></span>
+                                                </div>
+                                                <div class="media-body">
+                                                    <h6 class="mt-1 mb-2">Подтвердите электронную почту</h6>
+                                                    <p class="mb-0">Для перехода в личный кабинет необходимо подтвердить электронную почту. Письмо со ссылкой - в почтовом ящике <b>{{email}}</b>.</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <div class="text-center mt-5">
+                                        <button id="send-confirm-btn" class="btn btn-primary" data-email="{{email}}">Отправить ссылку повторно</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

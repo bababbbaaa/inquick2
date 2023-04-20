@@ -3,7 +3,7 @@ import pathlib
 from functools import wraps
 from config import Config, stop_list
 from flask_migrate import Migrate
-from flask import Flask, render_template, redirect, url_for, session, request, abort, send_from_directory, flash, get_flashed_messages
+from flask import Flask, render_template, redirect, url_for, session, request, abort, send_from_directory, flash, get_flashed_messages, jsonify
 from flask_mail import Mail, Message
 from urllib import parse
 import json
@@ -11,16 +11,16 @@ import requests
 import datetime
 import urllib
 from config import messages, roles, notification_level, ticket_status, tg_api_key
-from forms import ContactForm, AddProductForm, AddDocumentForm, CreateTicketForm, AnswerTicketForm, EditAccountForm, SalesFilterForm, MailForm, PromoForm, NotificationForm, ChangePasswordForm, EditProfileForm, RefForm, SignupForm, LoginForm, \
-    ProductForm, FileForm, LinkForm
+from forms import ContactForm, AddProductForm, CreateTicketForm, AnswerTicketForm, EditAccountForm, SalesFilterForm, MailForm, PromoForm, NotificationForm, ChangePasswordForm, EditProfileForm, RefForm, SignupForm, LoginForm, \
+    ProductForm, LinkForm
 from werkzeug.utils import secure_filename
-from models import db, Document, Ticket, TicketMessages, Notification, User, Product, Order, Attachment, check_promocode, Help
+from models import db, Notification, User, Product, Order, Attachment, check_promocode, Author
 from misc import generate_promocode, from_session, replace_aster, generate_password
 from transliterate import translit
 from misc import hide_url
 from itsdangerous.exc import BadSignature, SignatureExpired
 from itsdangerous import TimestampSigner
-from extensions import BotHandler, formaturl
+from extensions import BotHandler, formaturl, generate_confirmation_token, confirm_token
 from merchant_robokassa import calculate_signature, check_signature_result
 
 
@@ -54,7 +54,10 @@ def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not session.get('user'):
-            return redirect(url_for('login'))
+            return redirect (url_for('login_view'))
+        if not session['user'].get('confirmed'): session['user']['confirmed'] = False
+        if not session['user']['confirmed'] and request.method != 'POST':
+            return render_template('additional/confirm.html', extensions=['confirm'])
         return f(*args, **kwargs)
     return decorated_function
 
@@ -89,24 +92,6 @@ def check_permission(f):
         return f(*args, **kwargs)
     return decorated_function
 
-
-def get_duration(video_id):
-    api_key=Config.yt_api_key
-    searchUrl="https://www.googleapis.com/youtube/v3/videos?id="+video_id+"&key="+api_key+"&part=contentDetails"
-    response = requests.get(searchUrl)
-    data = json.loads(response.content)
-    all_data=data['items']
-    contentDetails=all_data[0]['contentDetails']
-    duration=contentDetails['duration']
-    try:
-        minutes = int(duration[2:].split('M')[0])
-    except:
-        minutes = 0
-    try:
-        seconds = int(duration[-3:-1])
-    except:
-        seconds = 0
-    return "{}:{}".format(minutes,seconds)
 
 
 def get_payment_link(processing='robo', order_id=None):
@@ -146,22 +131,13 @@ def get_payment_link(processing='robo', order_id=None):
     if processing == 'unitpay':
         pass
 
-def resend_confirmation_letter(email, signup=True):
-    hash = hide_url.dumps({"mail": email})
-    msg = 'Поздравляем с регистрацией' if signup else 'Изменен адрес электронной почты'
-    template = render_template('confirm_mail_template.html', email=email, hash=hash, msg=msg)
+def resend_confirmation_letter(email):
+    token = generate_confirmation_token(email)
+    template = render_template('emails/email-confirm.html', email=email, token=token)
     send_mail(email=email, template=template, subject='Подтверждение электронной почты')
-    session['msg'] = 'Письмо со ссылкой для активации адреса электронной почты успешно отправлено'
+    flash([1,'Письмо со ссылкой для активации адреса электронной почты успешно отправлено'])
     return 'OK'
 
-
-def send_goods(order):
-    hash = hide_url.dumps({"order_id": order.id})
-    link = url_for('check_order',hash=hash, _external=True)
-    msg = order.product.thank_text if order.product.thank_text else None
-    name = '{} {}'.format(order.product.content_info, order.product.name)
-    template = render_template('success_mail_template.html', branch=order.product.link, email=order.mail, name=name, link=link, msg=msg)
-    send_mail(email=order.mail, template=template, subject='[{}] Ваш доступ к материалам'.format(name))
 
 
 def send_mail(email=None, subject=None, msg=None, template=None, link=None, name=None):
@@ -179,51 +155,49 @@ def send_mail(email=None, subject=None, msg=None, template=None, link=None, name
         # Отправляем письмо
         mail.send(msg)
 
-@app.route('/tt')
-def tt():
-        hash = hide_url.dumps({"order_id": 1})
-        link = url_for('check_order',hash=hash, _external=True)
-        branch='meals'
-        email='mx001ka@gmail.com'
-        return render_template('success_mail_template.html', link=link, name='Сборник рецептов Детское меню', branch=branch, email=email)
 
 @app.route('/unsubscribe/<email>')
 def unsubscribe(email):
         return 'Вы успешно отказались от подписки'
 
 
+@app.route('/admin/confirmation')
+@login_required
+def confirm_view():
+    email = session['user'].get('email')
+    return render_template('additional/confirm.html', email=email)
 
-@app.route('/confirm_mail/<hash>')
-def confirm_mail(hash):
-    email = hide_url.loads(hash)['mail']
-    user = db.session.query(User).filter(User.mail==email).first()
-    if user:
-        if user.mail_confirm: return redirect(url_for('dashboard'))
-        user.mail_confirm = True
-        db.session.commit()
-        session["user"] = {
-                "id": user.id,
-                "mail": user.mail,
-                "role": user.role,
-                "username": user.username,
-                "promocode": user.promocode
-            }
-        session["msg"] = 'Адрес электронной почты успешно подтвержден'
+
+
+@app.route('/admin/account/confirm/<token>')
+def confirm_email(token):
+    email = confirm_token(token)
+    if email:
+        user = db.session.query(User).filter_by(email=email).first()
+        if user.email_confirmed:
+            flash([1, 'Электронная почта уже подтверждена'])
+        else:
+            user.email_confirmed = True
+            db.session.commit()
+            session['user'] = {'id': user.id, 'email': user.email, 'name': user.name, 'confirmed': user.email_confirmed}
+            flash([1, 'Электронная почта подтверждена успешно'])
     else:
-        session["msg"] = 'При подтверждении почты произошла ошибка'
-        session['msg_cat'] = 'danger'
-    return redirect(url_for('dashboard'))
+        flash([0, 'Ссылка неверная либо устарела'])
 
-@app.route('/.well-known/acme-challenge/fGNNyB785onnxDL2Nsnj2yQFIiU14lh1iHbnF8UpqUc')
-def challenge():
- return 'fGNNyB785onnxDL2Nsnj2yQFIiU14lh1iHbnF8UpqUc.u7yDhKvawxwwhupVsfj5o7uMs5f1xvECUH3FfzehkJY'
+    return redirect(url_for('admin_view'))
+
+
 
 @app.route('/admin')
+@login_required
 def admin_view():
-    return render_template('admin/dashboard.html', extensions=['dashboard'])
+    email = session['user']['email']
+    return render_template('admin/dashboard.html', extensions=['dashboard'], email=email)
 
 @app.route('/admin/calendar')
+@login_required
 def calendar_view():
+    email = session['user']['email']
     todayDate = datetime.date.today()
     plannerEvents = [
 				{
@@ -235,31 +209,52 @@ def calendar_view():
 				  'start': '2023-04-11T12:00:00',
                   'end': '2023-04-11T13:00:00'
 				}]
-    return render_template('admin/calendar.html', extensions=['calendar'], todayDate=todayDate, plannerEvents=plannerEvents)
+    return render_template('admin/calendar.html', extensions=['calendar'], todayDate=todayDate, plannerEvents=plannerEvents, email=email)
 
 
 @app.route('/admin/templates')
+@login_required
 def templates_view():
-    return render_template('admin/templates.html', extensions=['templates'])
+    email = session['user']['email']
+    return render_template('admin/templates.html', extensions=['templates'], email=email)
 
 
 @app.route('/admin/planner')
+@login_required
 def planner_view():
+    email = session['user']['email']
     todayDate = datetime.date.today()
+    return render_template('admin/planner.html', extensions=['planner'], todayDate=todayDate, email=email)
 
 
-    return render_template('admin/planner.html', extensions=['planner'], todayDate=todayDate)
+@app.route('/admin/products')
+@login_required
+def products_view():
+    email = session['user']['email']
+    todayDate = datetime.date.today()
+    return render_template('admin/products.html', extensions=['products'], todayDate=todayDate, email=email)
+
+
+@app.route('/admin/experts')
+@login_required
+def experts_view():
+    email = session['user']['email']
+    todayDate = datetime.date.today()
+    return render_template('admin/experts.html', extensions=['experts'], todayDate=todayDate, email=email)
+
+
+
 
 @app.route('/')
 def index_view():
-    form = ContactForm()
-    if request.method == 'POST' and form.validate_on_submit():
-        string = form.message.data
-        words_count = len(string.split(' '))
-        if not form.phone.data: form.phone.data = 0
-        if int(form.phone.data) > words_count: Telegram.send_message('Вопрос с сайта от {}({})\n{}'.format(form.nmf.data,  form.mail.data, form.message.data))
-        flash('Сообщение отправлено')
-        return redirect (url_for('main'))
+    # form = ContactForm()
+    # if request.method == 'POST' and form.validate_on_submit():
+    #     string = form.message.data
+    #     words_count = len(string.split(' '))
+    #     if not form.phone.data: form.phone.data = 0
+    #     if int(form.phone.data) > words_count: Telegram.send_message('Вопрос с сайта от {}({})\n{}'.format(form.nmf.data,  form.mail.data, form.message.data))
+    #     flash('Сообщение отправлено')
+    #     return redirect (url_for('main'))
     #return render_template('main.html', form=form, more_options=0)
     return redirect(url_for('admin_view'))
 
@@ -483,40 +478,12 @@ def check_order(hash):
 
 # ---------------------------- Обработка платежей ----------------------------------------
 
-@app.route("/payment/result", methods=['POST','GET'])
-def result_pay():
-    if request.args.get('OutSum') and request.args.get('InvId') and request.args.get('SignatureValue'):
-        inv_id = request.args.get('InvId')
-        out_sum = request.args.get('OutSum')
-        signature = request.args.get('SignatureValue')
-        if check_signature_result(inv_id, out_sum, signature, Config.merchant_password2):
-            order = db.session.query(Order).get(int(inv_id))
-            order.status = 1
-            db.session.commit()
-            send_goods(order)
-            print("ROBO: Payment status for order {} was changed to 1".format(order.id))
-            return f'OK{inv_id}'
-    return "bad sign"
+
 
 @app.route("/inquicksupportbot")
 def inquicksupportbot():
     return redirect('https://t.me/inquicksupportbot')
 
-@app.route("/resend-goods/<int:order_id>")
-@login_required
-def resend_goods(order_id):
-    order = db.session.query(Order).get(order_id)
-    if not order:
-        session['msg'] = messages.get('resend_goods_fail')
-        session['msg_cat'] = 'danger'
-        return redirect(url_for('sales'))
-    if order.status == 1:
-        send_goods(order)
-        session['msg'] = messages.get('resend_goods_ok')
-    else:
-        session['msg'] = messages.get('resend_goods_fail')
-        session['msg_cat'] = 'danger'
-    return redirect(url_for('sales'))
 
 @app.route('/payment/success', methods=['POST','GET'])
 def success_page():
@@ -567,46 +534,6 @@ def change_mail_request(user_id):
     req = change_mail(user_id)
     return req
 
-@app.route('/reset_password_request/<int:user_id>')
-@login_required
-@check_permission
-def reset_password_request(user_id):
-    user = User.query.get(user_id)
-    if user:
-        if not user.mail:
-            session["msg"] = messages.get('restore_password_error_no_mail')
-            session["msg_cat"] = 'danger'
-            return redirect(url_for('referal'))
-        hash = s.sign(user.mail)
-        template = render_template("reset_password_template.html", hash=hash.decode('UTF-8'))
-        session["msg"] = messages.get('restore_password_request')
-        send_mail(email=user.mail, template=template, subject='Сброс пароля')
-        return redirect(url_for('dashboard'))
-    else:
-        session["msg"] = messages.get('restore_password_error_no_user')
-        session["msg_cat"] = 'danger'
-        return redirect(url_for('referal'))
-
-
-@app.route('/reset_password/<hash>', methods=['GET','POST'])
-def reset_password(hash):
-    try:
-        mail = s.unsign(hash,max_age=900)  # * 60 sec = min
-    except SignatureExpired:
-        return abort(404)
-    form = ChangePasswordForm()
-    user = User.query.filter_by(mail=mail.decode('UTF-8')).first()
-    if not user: return abort(404)
-    if request.method == 'POST' and form.validate_on_submit():
-        if mail:
-            user.password = form.password.data
-            db.session.commit()
-            msg = messages.get('edit_profile_success')
-            session["msg"] = msg.format(user.username)
-            template = render_template('change_password_template.html', email=user.mail)
-            send_mail(email=user.mail, template=template, subject='Пароль был успешно изменен')
-            return redirect(url_for('dashboard'))
-    return render_template('restore_password_form.html', user=user, roles=roles, form=form, hash=hash)
 
 
 @app.route('/private/dashboard/')
@@ -849,15 +776,6 @@ def oferta_view():
 
 
 
-
-@app.route('/private/reports')
-@login_required
-def reports():
-    user = db.session.query(User).get(session['user']['id'])
-    documents = user.documents if user.role != 0 else Document.query.all()
-    msg = session.pop("msg") if session.get("msg") else ''
-    msg_cat = session.pop("msg_cat") if session.get("msg_cat") else 'success'
-    return render_template('reports.html', user=user, roles=roles, documents=documents, msg=msg, msg_cat=msg_cat)
 
 
 @app.route('/private/reports/delete/<int:document_id>', methods=["GET", "POST"])
@@ -1434,113 +1352,101 @@ def license():
 
 
 @app.route('/login', methods=["GET", "POST"])
-def login():
+def login_view():
+    email = request.form.get('email')
+    password = request.form.get('password')
     if session.get("user"):
-        return redirect(url_for('dashboard'))
-    form = LoginForm()
-    if request.method == "POST" and form.validate_on_submit():
-        mail = form.mail.data
-        user = User.query.filter_by(mail=mail.lower()).first()
-
-        if user and user.password_valid(form.password.data):
+        return redirect(url_for('admin_view'))
+    if email and password:
+        user = db.session.query(User).filter_by(email=email.lower()).first()
+        if user and user.password_valid(password):
             if user.blocked:
-                form.mail.errors.append("Доступ в ваш личный кабинет ограничен. Пожалуйста обратитесь в службу поддержки.")
-                return render_template('login.html', form=form)
-            session["user"] = {
-                "id": user.id,
-                "mail": user.mail,
-                "role": user.role,
-                "username": user.username,
-                "promocode": user.promocode
-            }
-            return redirect(url_for('dashboard'))
-        form.password.errors.append("Неверный логин или пароль")
-    return render_template('login.html', form=form)
+                return jsonify([0,'Учетная запись заблокирована'])
+            session['user'] = {'id': user.id, 'email': user.email,'name': user.name, 'confirmed': user.email_confirmed}
+            if user.role == 1: session['admin'] = True
+            return jsonify([2, 'Authorized', url_for('admin_view')])
+        return jsonify([0, 'Электронная почта или пароль указаны неверно'])
+    return render_template('auth/login.html', extensions=['auth'])
+
+@app.route('/forget', methods=["GET", "POST"])
+def forget_view():
+    email = request.form.get('email')
+    if request.method == 'POST':
+        if email:
+            user = db.session.query(User).filter_by(email=email.lower()).first()
+            if user and user.email_confirmed:
+                token = generate_confirmation_token(user.email)
+                template = render_template('emails/email-reset.html', email=user.email, token=token)
+                #send_mail(email=user.email, template=template, subject='Сброс пароля')
+                return jsonify([1, 'Ссылка для сброса пароля отправлена на электронную почту'])
+            else:
+                return jsonify([0, 'Пользователь не найден либо электронная почта не подтверждена'])
+            return jsonify([1, 'Ссылка для сброса пароля отправлена на электронную почту'])
+    return render_template('auth/forget.html', extensions=['auth'])
+
+
+@app.route('/admin/reset-password/<token>', methods=['POST','GET'])
+def reset_password(token):
+    email = confirm_token(token, expiration=901)
+    if email:
+        user = User.query.filter_by(email=email).first()
+        if user:
+            if request.method == 'POST':
+                new_password = request.form.get('password')
+                user.password = new_password
+                db.session.commit()
+                flash([1,'Пароль успешно изменен'])
+                template = render_template('emails/email-password-changed.html', email=user.email)
+                send_mail(email=user.email, template=template, subject='Пароль был изменен')
+                if session.get('user'): session.pop('user')
+
+                return jsonify([1, 'Пароль успешно изменен', url_for('admin_view')])
+            else:
+                return render_template('auth/change-password.html', token=token, extensions=['password'])
+        flash([0, 'Ссылка неверная либо устарела'])
+    return redirect(url_for('admin_view'))
+
+
 
 @app.route('/signup', methods=["GET", "POST"])
-def signup():
+def signup_view():
+    email = request.form.get('email')
+    password = request.form.get('password')
+    name = request.form.get('name')
+    if email and password:
+        user = db.session.query(User).filter_by(email=email.lower()).first()
+        if not user:
+            new_user = User(email=email.lower(), password=password, name=name, email_confirmed=False, registration_date=datetime.datetime.now(), role=0, confirmation_mail_sent_time=datetime.datetime.now())
+            db.session.add(new_user)
+            db.session.commit()
+            session['user'] = {'id': new_user.id, 'email': new_user.email,'name': new_user.name}
+            token = generate_confirmation_token(new_user.email)
+            template = render_template('emails/email-confirm.html', email=new_user.email, token=token)
+            send_mail(email=new_user.email, template=template, subject='Подтверждение электронной почты')
+            return jsonify([2, 'Регистрация выполнена', url_for('admin_view')])
+        else:
+            return jsonify([0, 'Указанный адрес электронной почты уже зарегистрирован'])
     if session.get("user"):
-        session['msg'] = 'Для перехода к регистрации выйдите из своего аккаунта (Меню "Настройки"-> "Выход")'
-        session['msg_cat'] = 'warning'
-        return redirect(url_for('dashboard'))
-    form = SignupForm()
-    if request.args.get('inv'):
-        form.promocode.data = request.args.get('inv')
-    if request.method == "POST" and form.validate_on_submit():
-        username = form.name.data
-        mail = form.mail.data
-        promocode = form.promocode.data
-        check_name = User.query.filter_by(username=username.lower()).first()
-        check_mail = User.query.filter_by(mail=mail.lower()).first()
-        new_user = User.query.filter_by(promocode=promocode.upper()).first()
-        errors = 0
-        if check_mail:
-            form.mail.errors.append("Электронная почта уже зарегистрирована, если вы забыли пароль - нажмите кнопку 'Забыли пароль' ниже")
-            errors += 1
-        if check_name:
-            form.name.errors.append("Логин уже занят, если вы забыли пароль - нажмите кнопку 'Забыли пароль' ниже")
-            errors += 1
-        if not new_user:
-            form.promocode.errors.append("К сожалению код приглашения не найден, пожалуйста проверьте правильность ввода, если у вас нет кода приглашения - нажмите 'Как получить код приглашения' ниже")
-            errors += 1
-        if new_user and new_user.blocked:
-            form.promocode.errors.append("К сожалению код приглашения заблокирован, пожалуйста обратитесь за новым кодом приглашения - нажмите 'Как получить код приглашения' ниже")
-            errors += 1
-        if new_user and new_user.username:
-            form.promocode.errors.append("К сожалению код приглашения уже использован, пожалуйста проверьте регистрировались ли вы ранее, если забыли пароль - восстановите его, либо запросите новый код приглашения")
-            errors += 1
-        if errors > 0:
-            return render_template('signup.html', form=form)
+        return redirect(url_for('admin_view'))
+    return render_template('auth/signup.html', extensions=['auth'])
 
-        new_user.username = username.lower()
-        new_user.mail = mail.lower()
-        new_user.password = form.password.data
-        new_user.archived = False
-        new_user.mail_confirm = False
-        db.session.commit()
-        print('User saved')
-        Telegram.send_message('Зарегистрирован новый пользователь.\nИмя пользователя {}'.format(new_user.username))
-        session["user"] = {
-                "id": new_user.id,
-                "mail": new_user.mail,
-                "role": new_user.role,
-                "username": new_user.username,
-                "promocode": new_user.promocode
-            }
 
-        hash = hide_url.dumps({"mail": new_user.mail})
-        template = render_template('confirm_mail_template.html', email=new_user.mail, hash=hash)
-        send_mail(email=new_user.mail, template=template, subject='Подтверждение электронной почты')
-        return redirect(url_for('dashboard'))
-    return render_template('signup.html', form=form)
-
-@app.route('/help', methods=['POST','GET'])
+@app.route('/admin/account/resend', methods=['POST'])
 @login_required
-def help():
-    form = LinkForm()
-    user = db.session.query(User).get(session['user']['id'])
-    videos = db.session.query(Help).order_by(Help.priority.asc())
-    if request.method == 'GET' and request.args.get('v'):
-        video = db.session.query(Help).filter(Help.content==request.args.get('v')).first()
-        return render_template("help_base.html", user=user, roles=roles, form=form, videos=videos, video=video)
-    if request.method == 'GET' and request.args.get('delete'):
-        video = db.session.query(Help).filter(Help.content==request.args.get('delete')).first()
-        db.session.delete(video)
+def resend_confirm_mail():
+    user_id = session['user'].get('id')
+    user = db.session.query(User).get(user_id)
+    if user:
+        if user.email_confirmed:
+            return jsonify([2,'Электронная почта уже подтверждена', url_for('admin_view')])
+        now = datetime.datetime.now()
+        if user.confirmation_mail_sent_time + datetime.timedelta(minutes=5) > now:
+            return jsonify([0, 'Письмо уже отправлено. Повторите попытку позже'])
+        #resend_confirmation_letter(user.email)
+        user.confirmation_mail_sent_time = now
         db.session.commit()
-        return redirect(url_for('help'))
-    if request.method == 'POST' and form.validate_on_submit():
-        video = form.content.data.split('=')
-        length = get_duration(video[1])
-        new_video = Help(content=video[1], description=form.description.data, priority=form.priority.data if form.priority.data else 100, length=length)
-        db.session.add(new_video)
-        db.session.commit()
-        return redirect(url_for('help'))
-    return render_template("help_base.html", user=user, roles=roles, form=form, videos=videos)
-
-@app.route('/private/resend_confirm_mail/<email>')
-def resend_confirm_mail(email):
-    resend_confirmation_letter(email)
-    return redirect(url_for('dashboard'))
+        return jsonify([1, 'Письмо отправлено'])
+    return abort(404)
 
 @app.route('/private/product/add', methods=["GET", "POST"])
 @login_required
@@ -1667,112 +1573,174 @@ def edit_attachment(attachment_id, command):
     return redirect(url_for('product'))
 
 
-@app.route('/private/attachment/add/<a_type>/<int:product_id>', methods=["GET", "POST"])
-@login_required
-def add_attachment(a_type, product_id):
-    user = db.session.query(User).get(session['user']['id'])
-    if user.role > 2: return redirect(url_for('dashboard'))
-    product = db.session.query(Product).get(product_id)
-    if a_type == 'file':
-        form = FileForm()
-
-        if  request.method == 'POST' and form.validate_on_submit():
-            pathlib.Path(app.config['UPLOAD_FOLDER'], str(product_id)).mkdir(exist_ok=True)
-
-            try:
-                f = translit(form.content.data.filename, reversed=True)
-            except:
-                f = form.content.data.filename
-            filename = secure_filename(f)
-            check_attachment = Attachment.query.filter(Attachment.content==filename, Attachment.product_id==product_id).first()
-            if check_attachment:
-                form.content.errors.append('Этот файл уже загружен!')
-                return render_template('add_attachment.html', form=form, product_id=product_id, type=a_type, roles=roles, user=user)
-            form.content.data.save(os.path.join(app.config['UPLOAD_FOLDER'], str(product_id), filename))
-            if not form.description.data:
-                title = filename
-            else:
-                title = form.description.data
-
-            new_attachment = Attachment(content=filename, description=title, product_id=product_id, type='file')
-            db.session.add(new_attachment)
-            db.session.commit()
-
-            msg = messages.get('save_file_success')
-            session["msg"] = msg.format(product.name)
-            return redirect(url_for('product'))
-        else:
-            return render_template('add_attachment.html', form=form, product_id=product_id, type=a_type, roles=roles, user=user)
-    if a_type == 'link':
-        form = LinkForm()
-        if request.method == 'POST' and form.validate_on_submit():
-            hearders = {'headers':'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:51.0) Gecko/20100101 Firefox/51.0'}
-            link = form.content.data
-            link = formaturl(link)
-            title = None
-            try:
-                n = requests.get(link, headers=hearders)
-            except:
-                form.content.errors.append("Проверьте правильность ссылки, не удается получить контент")
-                return render_template('add_attachment.html', form=form, product_id=product_id, type=a_type, user=user, roles=roles)
-            if n.status_code != 200:
-                form.content.errors.append("Проверьте правильность ссылки, не удается получить контент")
-                return render_template('add_attachment.html', form=form, product_id=product_id, type=a_type, user=user, roles=roles)
-            if not form.description.data:
-
-                content_type = n.headers['Content-Type']
-                if 'text/html' in content_type:
-                    n.encoding = 'utf-8'
-                    al = n.text
-                    title = al[al.find('<title>') + 7 : al.find('</title>')]
-            else:
-                title = form.description.data
-            new_attachment = Attachment(content=link, description=title, product_id=product_id, type='link')
-            db.session.add(new_attachment)
-            db.session.commit()
-            msg = messages.get('save_link_success')
-            session["msg"] = msg.format(product_id)
-            return redirect(url_for('product'))
-
-    return render_template('add_attachment.html', form=form, product_id=product_id, type=a_type, user=user, roles=roles)
-
 
 
 @app.errorhandler(404)
 def render_not_found(error):
-    return render_template('404.html', error=404)
+    return render_template('errors/error.html', error=404)
 
 
 @app.errorhandler(500)
 def render_server_error(error):
-     return render_template('404.html', error=500)
+     return render_template('errors/error.html', error=500)
 
 
 
 
 #--------------------------- WITHOUT VIEWS --------------------------------------
 
+@app.route('/admin/logout')
+def logout_handler():
+    if session.get('user'):
+        session.pop('user')
+    return redirect(url_for('index_view'))
+
+
 @app.route('/admin/api/planner/communications', methods=['POST'])
 def edit_communication_date_handler():
     print(request.form)
 
-    return [1, 'Все хорошо']
+    return jsonify([1, 'Все хорошо'])
+
+@app.route('/admin/api/bloger/edit', methods=['POST'])
+def edit_bloger_handler():
+    print(request.form)
+
+    return jsonify([1, 'Все хорошо'])
+
+@app.route('/admin/api/expert/get', methods=['POST'])
+@login_required
+def get_expert_handler():
+    print(request.form)
+    uid = request.form.get('uid', type=int)
+    author = db.session.query(Author).get(uid)
+    if author:
+        if author.created_by == session['user']['id']:
+            return jsonify({'name':author.name, 'commission': author.commission, 'link': author.link, 'comment': author.comment})
+
+    return jsonify({'name': '', 'commission': '', 'link': '', 'comment': ''})
 
 
+@app.route('/admin/api/product/edit', methods=['POST'])
+def edit_product_handler():
+    try:
+        print(request.form)
+        name = request.form.get('expert-name', '')
+        if not name: raise NameError('имя/ник не установлено')
+        link = request.form.get('expert-link')
+        link = formaturl(link)
+        commission = request.form.get('expert-commission')
+        comment = request.form.get('expert-comment')
+        uid = request.form.get('uid', type=int)
+        if uid:
+            author = db.session.query(Author).get(uid)
+            if not author:
+                raise NameError('не удалось найти эксперта')
+            else:
+                author.name = name
+                author.commission = commission
+                author.comment = comment
+                author.link = link
+                db.session.commit()
+                return jsonify([1, 'Изменения сохранены'])
+        else:
+            new_author = Author(name=name, link=link,commission=commission,comment=comment, created_by=session['user']['id'], created_date=datetime.datetime.today())
+            db.session.add(new_author)
+            db.session.commit()
+            return jsonify([1, 'Эксперт создан'])
+
+    except Exception as e:
+        return jsonify([0, f'Произошла ошибка, {e}'])
+
+@app.route('/admin/api/expert/edit', methods=['POST'])
+def edit_expert_handler():
+    try:
+        print(request.form)
+        name = request.form.get('expert-name', '')
+        if not name: raise NameError('имя/ник не установлено')
+        link = request.form.get('expert-link')
+        link = formaturl(link)
+        commission = request.form.get('expert-commission')
+        comment = request.form.get('expert-comment')
+        uid = request.form.get('uid', type=int)
+        if uid:
+            author = db.session.query(Author).get(uid)
+            if not author:
+                raise NameError('не удалось найти эксперта')
+            else:
+                author.name = name
+                author.commission = commission
+                author.comment = comment
+                author.link = link
+                db.session.commit()
+                return jsonify([1, 'Изменения сохранены'])
+        else:
+            new_author = Author(name=name, link=link,commission=commission,comment=comment, created_by=session['user']['id'], created_date=datetime.datetime.today())
+            db.session.add(new_author)
+            db.session.commit()
+            return jsonify([1, 'Эксперт создан'])
+
+    except Exception as e:
+        return jsonify([0, f'Произошла ошибка, {e}'])
+
+@app.route('/admin/api/experts/table', methods=['GET'])
+@login_required
+def experts_table_handler():
+    #user_authors = db.session.query(Author).filter(Author.created_by==session['user']['id']).delete()
+    #db.session.commit()
+    user_authors = db.session.query(Author).filter(Author.created_by == session['user']['id']).all()
+    authors = []
+    for author in user_authors:
+        authors.append([author.name,author.link,author.commission, author.comment, datetime.datetime.strftime(author.created_date, '%d-%m-%Y') , author.id])
+
+    return jsonify({"data": authors})
+
+@app.route('/admin/api/experts/list', methods=['POST'])
+@login_required
+def experts_list_handler():
+    user_authors = db.session.query(Author).filter(Author.created_by == session['user']['id']).all()
+    lst = []
+    for author in user_authors:
+        lst.append({'text': author.name, 'id':author.id})
+    a = {
+  "results": [
+    {
+      "id": 1,
+      "text": "Option 1"
+    },
+    {
+      "id": 2,
+      "text": "Option 2"
+    }
+  ]
+}
+    return jsonify(a)
+
+@app.route('/admin/api/products/table', methods=['GET'])
+@login_required
+def products_table_handler():
+    #user_authors = db.session.query(Author).filter(Author.created_by==session['user']['id']).delete()
+    #db.session.commit()
+    products = db.session.query(Product).filter(Product.created_by == session['user']['id']).all()
+    products_out = []
+    for product in products:
+        products_out.append([product.name,product.link,product.author.name,f'{product.price}р./{product.promo_price}р.', product.comment, datetime.datetime.strftime(product.created_date, '%d-%m-%Y') , product.id])
+
+    return jsonify({"data": products_out})
 
 @app.route('/admin/api/planner/states', methods=['POST'])
 def change_state_handler():
     print(request.form)
-    return [1, 'Все хорошо']
+    return jsonify([1, 'Все хорошо'])
 
 
 @app.route('/admin/api/planner/comment/get', methods=['POST'])
 def get_comment_handler():
     try:
         print(request.form)
-        return [1,'comment']
+        return jsonify([1,'comment'])
     except Exception as e:
-        return [0, f'Произошла ошибка {e}']
+        return jsonify([0, f'Произошла ошибка {e}'])
 
 
 @app.route('/admin/api/planner/comment', methods=['POST'])
@@ -1780,9 +1748,9 @@ def edit_comment_handler():
     try:
 
         print(request.form)
-        return [1, 'Комментарий сохранен']
+        return jsonify([1, 'Комментарий сохранен'])
     except Exception as e:
-        return [0, f'Произошла ошибка {e}']
+        return jsonify([0, f'Произошла ошибка {e}'])
 
 @app.route('/admin/api/planner/contentaccess', methods=['POST'])
 def content_access_handler():

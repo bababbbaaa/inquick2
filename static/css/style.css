@@ -20844,7 +20844,7 @@ Fixing Order => Base + Typography >> General Layout + Grid >> Page Layout + Comp
 
 .form-control.is-invalid {
   border-color: #f72b50 !important;
-  border-right: 0px !important; }
+ }
   .form-control.is-invalid:focus {
     box-shadow: none; }
 
@@ -30044,4 +30044,4 @@ html[dir="rtl"] [direction="rtl"][data-sidebar-style="compact"]:not([data-layout
     [data-theme-version="dark"] .footer .copyright a {
       color: #fff; }
 
-/*# sourceMappingURL=style.css.map */
+

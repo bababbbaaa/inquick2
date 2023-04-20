@@ -1,6 +1,8 @@
+    $('.multi-select').select2();
     $(".notify-dialog").hide();
     $(".agree-dialog").hide();
     $(".cancel-dialog").hide();
+
     var $bloger_id = null;
     var $state_id = null;
     var $target_element = null;
@@ -55,7 +57,30 @@ $('#communicationsModal').on('show.bs.modal', function (e) {
   $("#communicationsModal .datepicker-default").val(currentDate);
 });
 
+$('#blogerModal').on('show.bs.modal', function (e) {
+     $("#bloger-details").hide();
+     $("#bloger-form")[0].reset();
+     $("#save-bloger").attr('disabled', true);
+     $("#save-bloger").addClass('light btn-dark');
+     $("#save-bloger").removeClass('btn-success');
+     $('.multi-select').val(null).trigger("change");
 
+});
+
+$('.multi-select').on("change", function(){
+      var selectData = $(this).find(':selected');
+      $("#bloger-details").show();
+      $("#save-bloger").removeAttr('disabled');
+      $("#save-bloger").removeClass('light btn-dark');
+      $("#save-bloger").addClass('btn-success');
+      if (selectData.length == 0) {
+      $("#bloger-details").hide();
+      $("#save-bloger").attr('disabled', true);
+      $("#save-bloger").addClass('light btn-dark');
+      $("#save-bloger").removeClass('btn-success');
+      $("#bloger-form")[0].reset();
+      }
+  });
 
 $('#statusModal').on('show.bs.modal', function (e) {
   $(".change-state" ).each(function() {
@@ -101,8 +126,27 @@ $('#commentModal').on('show.bs.modal', function (e) {
                                         ErrorMessageSend(data[1], 'Произошла ошибка')
                                         } else {
                                         SuccessMessageSend(data[1], 'Сохранено')
+                                        $target_text = jQuery.trim($target_text).substring(0, 40).trim(this) + "...";
                                         $target_element.text($target_text);
                                         $('#commentModal').modal('hide');
+                                        }
+                                        });
+
+
+    });
+
+
+    $("#save-communication").click(function(event) {
+             event.preventDefault();
+             $target_text = $("#communication-date").val();
+             $.post( $editCommunicationDateEndpoint, {'bloger_id': $bloger_id, 'communication': $target_text} )
+                              .done(function( data ) {
+                              if (data[0] == 0) {
+                                        ErrorMessageSend(data[1], 'Произошла ошибка')
+                                        } else {
+                                        SuccessMessageSend(data[1], 'Сохранено')
+                                        $("<a href='javascript:void(0)' class='badge badge-rounded badge-outline-light'>" + $target_text + "</a><br>" ).insertBefore($target_element);
+                                        $('#communicationsModal').modal('hide');
                                         }
                                         });
 
@@ -134,8 +178,6 @@ $('#commentModal').on('show.bs.modal', function (e) {
               event.preventDefault();
               $('#state-id').val($state_id);
               params = $("#state-form").serializeArray();
-              console.log(params);
-
               $.post( $changeStateEndpoint, params )
                               .done(function( data ) {
                               if (data[0] == 0) {

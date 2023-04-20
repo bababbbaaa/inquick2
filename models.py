@@ -17,41 +17,36 @@ class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(128))
-    mail = db.Column(db.String, unique=True)
+    email = db.Column(db.String, unique=True)
     password_hash = db.Column(db.String(128))
     phone = db.Column(db.String(128))
-    promocode = db.Column(db.String, unique=True)
+    telegram_id = db.Column(db.Integer)
+    promocode = db.Column(db.String)
     proc = db.Column(db.Integer)
     orders = db.relationship('Order', back_populates="refferer")
-    tickets = db.relationship('Ticket', back_populates="recipient")
     archived = db.Column(db.Boolean)
     blocked = db.Column(db.Boolean)
-    #products = db.relationship('Product', back_populates="authors")
     role = db.Column(db.Integer, nullable = False)
-    refferer_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    products = db.relationship('Product', secondary=users_products_association, back_populates='users')
-    notifications = db.relationship('Notification', secondary=unread_notifications, back_populates='users')
+    registration_date = db.Column(db.DateTime)
+    registration_code = db.Column(db.String)
+    notifications = db.relationship('Notification', back_populates='user')
+    products = db.relationship('Product', back_populates='user')
     license_agreement = db.Column(db.Boolean)
     controled_users = db.relationship('User', backref=db.backref('parent', remote_side=[id]), lazy = True)
+    name = db.Column(db.String)
     surname = db.Column(db.String)
     first_name = db.Column(db.String)
     middle_name = db.Column(db.String)
-    business_type = db.Column(db.String)
-    accounting_data = db.Column(db.String)
-    inn = db.Column(db.String)
     full_name = db.Column(db.String)
-    passport = db.Column(db.String)
-    address = db.Column(db.String)
-    bank_name = db.Column(db.String)
-    bank_bik = db.Column(db.String)
-    bank_account = db.Column(db.String)
-    bank_kor = db.Column(db.String)
-    documents = db.relationship('Document', back_populates="recipient")
-    mail_confirm = db.Column(db.Boolean)
+    email_confirmed = db.Column(db.Boolean)
+    confirmation_mail_sent_time = db.Column(db.DateTime)
+    parent_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
     def get_children_list(self) -> []:
-        beginning_getter = db.session.query(User).filter(User.id == self.id).cte(name='children_for', recursive=True)
-        with_recursive = beginning_getter.union_all(db.session.query(User).filter(User.refferer_id == beginning_getter.c.id))
+        beginning_getter = db.session.query(User).filter(User.id == self.id).cte(name='children_for',
+                                                                                       recursive=True)
+        with_recursive = beginning_getter.union_all(
+            db.session.query(User).filter(User.parent_id == beginning_getter.c.id))
         return db.session.query(with_recursive).all()
 
     def __repr__(self):
@@ -68,54 +63,6 @@ class User(db.Model):
     def password_valid(self, password):
         return check_password_hash(self.password_hash, password)
 
-class Document(db.Model):
-    __tablename__ = 'documents'
-    id = db.Column(db.Integer, primary_key=True)
-    recipient = db.relationship("User")
-    recipient_id = db.Column(db.Integer, db.ForeignKey("users.id"))
-    filename = db.Column(db.String)
-    name = db.Column(db.String)
-    sent_date = db.Column(db.DateTime)
-    read_date = db.Column(db.DateTime)
-
-
-class Ticket(db.Model):
-    __tablename__ = 'tickets'
-    id = db.Column(db.Integer, primary_key=True)
-    recipient = db.relationship("User")
-    recipient_id = db.Column(db.Integer, db.ForeignKey("users.id"))
-    last_update = db.Column(db.DateTime)
-    subject = db.Column(db.String)
-    messages = db.relationship("TicketMessages")
-    archived = db.Column(db.Boolean)
-    deleted = db.Column(db.Boolean)
-    status = db.Column(db.Integer)
-
-class TicketMessages(db.Model):
-    __tablename__ = 'tickets_messages'
-    id = db.Column(db.Integer, primary_key=True)
-    ticket = db.relationship("Ticket",back_populates="messages")
-    ticket_id = db.Column(db.Integer, db.ForeignKey("tickets.id"))
-    sender = db.relationship("User")
-    sender_id = db.Column(db.Integer, db.ForeignKey("users.id"))
-    date = db.Column(db.DateTime)
-    unread = db.Column(db.Boolean)
-    message = db.Column(db.String)
-
-
-class Message(db.Model):
-    __tablename__ = 'messages'
-    id = db.Column(db.Integer, primary_key=True)
-    chat_id = db.Column(db.Integer)
-    is_sender = db.Column(db.Boolean)
-    recipient = db.relationship("User")
-    recipient_id = db.Column(db.Integer, db.ForeignKey("users.id"))
-    date = db.Column(db.DateTime)
-    subject = db.Column(db.String)
-    message = db.Column(db.String)
-    unread = db.Column(db.Boolean)
-    archived = db.Column(db.Boolean)
-    deleted = db.Column(db.Boolean)
 
 class Authorization(db.Model):
     __tablename__ = 'auth'
@@ -130,12 +77,27 @@ class Authorization(db.Model):
 class Notification(db.Model):
     __tablename__ = 'notifications'
     id = db.Column(db.Integer, primary_key=True)
-    sender = db.relationship("User")
-    sender_id = db.Column(db.Integer, db.ForeignKey("users.id"))
-    date = db.Column(db.DateTime)
-    level = db.Column(db.Integer)
+    user = db.relationship("User")
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+    target_time = db.Column(db.DateTime)
     message = db.Column(db.String)
-    users = db.relationship('User', secondary=unread_notifications, back_populates='notifications')
+    created = db.Column(db.DateTime)
+    sent = db.Column(db.Boolean)
+    sent_date = db.Column(db.DateTime)
+
+class Author(db.Model):
+    __tablename__ = 'authors'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String)
+    link = db.Column(db.String)
+    user = db.relationship("User")
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+    products = db.relationship('Product', back_populates='author')
+    commission = db.Column(db.Integer)
+    created_by = db.Column(db.Integer)
+    created_date = db.Column(db.DateTime)
+    comment = db.Column(db.String)
+
 
 
 class Product(db.Model):
@@ -144,28 +106,20 @@ class Product(db.Model):
     name = db.Column(db.String, nullable=False)
     price = db.Column(db.Integer, nullable=False)
     promo_price = db.Column(db.Integer, nullable=False)
-    image = db.Column(db.String)
-    thank_text = db.Column(db.String)
     link = db.Column(db.String)
     attachments = db.relationship("Attachment")
     orders = db.relationship("Order")
     conversions = db.Column(db.Integer)
     archived = db.Column(db.Boolean)
-    moderated = db.Column(db.Boolean)
-    with_ref = db.Column(db.Boolean)
-    author = db.relationship("User")
-    author_id = db.Column(db.Integer, db.ForeignKey("users.id"))
-    users = db.relationship('User', secondary=users_products_association, back_populates='products')
-    about_info = db.Column (db.String)
-    content_info = db.Column (db.String)
+    author = db.relationship("Author")
+    author_id = db.Column(db.Integer, db.ForeignKey("authors.id"))
+    user = db.relationship("User")
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+    created_by = db.Column(db.Integer)
     description = db.Column(db.String)
-    skills = db.Column(db.String)
-    main_result = db.Column(db.String)
-    additional_info = db.Column(db.String)
-    short_description = db.Column(db.String)
-    commercial_name = db.Column(db.String)
-    author_avatar = db.Column(db.String)
-    main_img = db.Column(db.String)
+    real_product_id = db.Column(db.Integer, db.ForeignKey('products.id'))
+    created_date = db.Column(db.DateTime)
+
 
     def get_users_ids(self):
         ids = []
@@ -184,16 +138,6 @@ class Attachment(db.Model):
     description = db.Column(db.String)
 
 
-class Help(db.Model):
-    __tablename__ = 'help'
-    id = db.Column(db.Integer, primary_key=True)
-    content = db.Column(db.String)
-    description = db.Column(db.String)
-    length = db.Column(db.String)
-    category = db.Column(db.String)
-    text = db.Column(db.String)
-    priority = db.Column(db.Integer)
-
 class Order(db.Model):
     __tablename__ = 'orders'
     id = db.Column(db.Integer, primary_key=True)
@@ -205,6 +149,7 @@ class Order(db.Model):
     status = db.Column(db.Integer)
     refferer = db.relationship("User", back_populates="orders")
     refferer_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+    promocode = db.Column(db.String)
     archived = db.Column(db.Boolean)
 
 def check_promocode(promocode):

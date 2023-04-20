@@ -1,0 +1,52 @@
+<div class="modal fade" id="productModal" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static" style="display: none;">
+                                        <div class="modal-dialog modal-dialog-centered" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Создать новый продукт</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal">
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <form id="bloger-form">
+                                                   <div class="mb-3">
+                                            <label class="mb-1"><strong>Эксперт</strong></label>
+                                            <select id="expert-select" class="form-control">
+                                                <option value="AL">Alabama</option>
+                                                <option value="WY">Wyoming</option>
+                                            </select>
+                                            <div class="invalid-feedback">Это поле обязательно для заполнения</div>
+                                        </div>
+                                                          <div class="mb-3">
+                                            <label class="mb-1"><strong>Ссылка на профиль</strong></label>
+                                            <input type="text" name="expert-link" class="form-control" placeholder="https://">
+
+                                        </div>
+
+                                               <div class="mb-3">
+                                                   <div>
+                                            <label class="mb-1"><strong>Продукт</strong></label>
+                                            <select class="default-select  form-control wide" style="display: none;">
+                                                <option>1</option>
+                                                <option>2</option>
+                                                <option>3</option>
+                                                <option>4</option>
+                                            </select>
+                                                       </div>
+                                             <div class="invalid-feedback">Это поле обязательно для заполенения</div>
+                                                 <a href="#" class="small p-2">+ Создать новый продукт</a>
+
+                                        </div>
+                                                    <div class="mb-3">
+                                            <label class="mb-1"><strong>Комментарий</strong></label>
+                                            <textarea id="comment-text" class="form-control" rows="5" style="height: auto;"></textarea>
+
+                                        </div>
+                                        </form>
+                                        </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-danger light" data-bs-dismiss="modal">Закрыть</button>
+                                                    <a id="save-product" href="javascript:void(0);" class="btn btn-success"><i class="fa fa-plus me-2"></i>Добавить</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>

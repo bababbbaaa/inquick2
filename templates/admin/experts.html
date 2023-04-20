@@ -1,0 +1,66 @@
+{% extends "admin/index.html" %}
+
+
+{% block container %}
+<!--**********************************
+            Content body start
+        ***********************************-->
+<div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h4 class="card-title">Эксперты</h4>
+									<button id="add-expert" type="button" class="btn btn-info">Добавить эксперта <span class="btn-icon-end"><i class="fa fa-plus"></i></span>
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table id="experts-table" class="display" style="min-width: 845px">
+                                        <thead>
+                                            <tr>
+
+                                                 <th>Имя/ник</th>
+                                                <th>Ссылка на профиль</th>
+                                                <th>Комиссия (%)</th>
+                                                <th>Комментарий</th>
+                                                <th>Добавлено</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                                 <tr>
+
+                                                <td>kniazeva_alena</td>
+                                                <td>https://www.alenakniazeva.ru</td>
+                                                <td>50%</td>
+                                                     <td>Договорились о сотрудничестве</td>
+                                                     <td>12-05-2023</td>
+                                                <td>
+													<div class="dropdown ms-auto text-start">
+														<div class="btn-link pointer-link" data-bs-toggle="dropdown" aria-expanded="false">
+															<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"></rect><circle fill="#000000" cx="5" cy="12" r="2"></circle><circle fill="#000000" cx="12" cy="12" r="2"></circle><circle fill="#000000" cx="19" cy="12" r="2"></circle></g></svg>
+														</div>
+														<div class="dropdown-menu dropdown-menu-start" style="margin: 0px;">
+															<button class="dropdown-item control-buttons" data-uid=1 ><i class="fa fa-edit me-2"></i>Редактировать</button>
+															<a class="dropdown-item control-buttons"  href="#" data-uid=1 ><i class="fa fa-archive me-2"></i>Убрать в архив</a>
+														</div>
+													</div>
+												</td>
+                                            </tr>
+
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+
+
+
+{% endblock %}
+        <!--**********************************
+            Content body end
+        ***********************************-->

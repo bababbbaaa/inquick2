@@ -48,7 +48,8 @@ class RoboTest:
 
 class Config:
     DEBUG = False
-    SECRET_KEY = "3423rfdf34t"
+    SECRET_KEY = "UAHdhy73dhsdBXBag267!csdk*98d72"
+    SECURITY_PASSWORD_SALT = "JYQBdyhQwXC7j6s2:w2SF"
     SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     UPLOAD_FOLDER = current_path + '/storage/'

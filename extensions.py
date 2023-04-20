@@ -1,6 +1,7 @@
 import re
 import requests
-
+from itsdangerous import URLSafeTimedSerializer
+from config import Config
 
 class BotHandler:
 
@@ -24,7 +25,21 @@ def formaturl(url):
         return 'https://{}'.format(url)
     return url
 
-class Mailer:
-    def __init__(self, token):
-        self.token = token
-        self.api_url = "https://api.telegram.org/bot{}/".format(token)
+
+
+def generate_confirmation_token(email):
+    serializer = URLSafeTimedSerializer(Config.SECRET_KEY)
+    return serializer.dumps(email, salt=Config.SECURITY_PASSWORD_SALT)
+
+
+def confirm_token(token, expiration=3600):
+    serializer = URLSafeTimedSerializer(Config.SECRET_KEY)
+    try:
+        email = serializer.loads(
+            token,
+            salt=Config.SECURITY_PASSWORD_SALT,
+            max_age=expiration
+        )
+    except:
+        return False
+    return email

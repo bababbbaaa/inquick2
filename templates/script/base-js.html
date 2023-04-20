@@ -1,0 +1,30 @@
+<script src="{{url_for('static', filename='vendor/global/global.min.js')}}"></script>
+<script src="{{url_for('static', filename='js/custom.min.js')}}"></script>
+<script src="{{url_for('static', filename='js/dlabnav-init.js')}}"></script>
+<script src="{{url_for('static', filename='vendor/toastr/js/toastr.min.js')}}"></script>
+{% if 'auth' in extensions %}
+<script>
+    var $redirectEndpoint = "{{url_for('admin_view')}}"
+</script>
+<script src="{{url_for('static', filename='js/auth.js')}}"></script>
+{% endif %}
+{% if 'confirm' in extensions %}
+<script>
+    {% include 'script/notifications.html' %}
+    	{% with messages = get_flashed_messages() %}
+	{% if messages %}
+	{% for message in messages %}
+		{% if message[0] == 1 %}
+		SuccessMessageSend('{{message[1]}}', 'Готово');
+		{% endif %}
+		{% if message[0] == 0 %}
+		ErrorMessageSend('{{message[1]}}', 'Произошла ошибка');
+		{% endif %}
+
+	{% endfor %}
+	{% endif %}
+	{% endwith %}
+    var $confirmationEndpoint = "{{url_for('resend_confirm_mail')}}"
+</script>
+<script src="{{url_for('static', filename='js/confirm.js')}}"></script>
+{% endif %}
