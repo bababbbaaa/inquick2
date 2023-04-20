@@ -57,6 +57,10 @@ def login_required(f):
             return redirect (url_for('login_view'))
         if not session['user'].get('confirmed'): session['user']['confirmed'] = False
         if not session['user']['confirmed'] and request.method != 'POST':
+            user = db.session.query(User).get(session['user']['id'])
+            if not user:
+                session.pop('user')
+                return redirect(url_for('login_view'))
             return render_template('additional/confirm.html', extensions=['confirm'])
         return f(*args, **kwargs)
     return decorated_function
@@ -141,19 +145,22 @@ def resend_confirmation_letter(email):
 
 
 def send_mail(email=None, subject=None, msg=None, template=None, link=None, name=None):
-    with app.app_context():
-        if template:
-            text_body = template
-        # - Создаем письмо
-        msg = Message(
-            subject,
-            sender=('Команда INQUICK','no-reply@inquick.ru'),       # Отправитель тот же, кто и получатель
-            recipients=[email]  # Получатель может быть не один, а потому мы передаем список
-        )
-        # - Добавляем тело письма в виде текста
-        msg.html = text_body
-        # Отправляем письмо
-        mail.send(msg)
+    if app.config['IS_TEST']:
+        print(template)
+    else:
+        with app.app_context():
+            if template:
+                text_body = template
+            # - Создаем письмо
+            msg = Message(
+                subject,
+                sender=('Команда INQUICK','no-reply@inquick.ru'),       # Отправитель тот же, кто и получатель
+                recipients=[email]  # Получатель может быть не один, а потому мы передаем список
+            )
+            # - Добавляем тело письма в виде текста
+            msg.html = text_body
+            # Отправляем письмо
+            mail.send(msg)
 
 
 @app.route('/unsubscribe/<email>')
@@ -560,11 +567,7 @@ def dashboard():
     return render_template('dashboard.html', own_sales_today=own_sales_today, ref_sales_today=ref_sales_today, msg=msg, msg_cat=msg_cat, products=products, user=user, roles=roles, unread_notifications=unread_notifications)
 
 
-@app.route('/private/logout', methods=["GET", "POST"])
-@login_required
-def logout():
-    session.pop('user')
-    return redirect(url_for("login"))
+
 
 
 @app.route('/private/sales', methods=["GET", "POST"])
@@ -1430,6 +1433,11 @@ def signup_view():
         return redirect(url_for('admin_view'))
     return render_template('auth/signup.html', extensions=['auth'])
 
+@app.route('/d')
+def delete_user():
+    user = db.session.query(User).filter(User.email=='mx001ka@gmail.com').delete()
+    db.session.commit()
+    return 'ok'
 
 @app.route('/admin/account/resend', methods=['POST'])
 @login_required
@@ -1620,32 +1628,46 @@ def get_expert_handler():
 
     return jsonify({'name': '', 'commission': '', 'link': '', 'comment': ''})
 
+@app.route('/admin/api/product/get', methods=['POST'])
+@login_required
+def get_product_handler():
+    print(request.form)
+    uid = request.form.get('uid', type=int)
+    product = db.session.query(Product).get(uid)
+    if product:
+        if product.created_by == session['user']['id']:
+            return jsonify({'author':product.author_id,'author_name':product.author.name, 'name':product.name, 'price': product.price, 'promo_price': product.promo_price, 'link': product.link, 'comment': product.comment})
+
+    return jsonify({'author': '', 'author_name': '', 'name': '', 'promo-price': '', 'price': '', 'link': '', 'comment': ''})
 
 @app.route('/admin/api/product/edit', methods=['POST'])
 def edit_product_handler():
     try:
         print(request.form)
-        name = request.form.get('expert-name', '')
-        if not name: raise NameError('имя/ник не установлено')
-        link = request.form.get('expert-link')
+        name = request.form.get('product-name', '')
+        if not name: raise NameError('название продукта не установлено')
+        link = request.form.get('product-link')
         link = formaturl(link)
-        commission = request.form.get('expert-commission')
-        comment = request.form.get('expert-comment')
+        promo_price = request.form.get('product-promo-price', type=int)
+        price = request.form.get('product-price', type=int)
+        comment = request.form.get('product-comment', '')
+        author_id = request.form.get('product-expert')
         uid = request.form.get('uid', type=int)
         if uid:
-            author = db.session.query(Author).get(uid)
-            if not author:
+            product = db.session.query(Product).get(uid)
+            if not product:
                 raise NameError('не удалось найти эксперта')
             else:
-                author.name = name
-                author.commission = commission
-                author.comment = comment
-                author.link = link
+                product.name = name
+                product.promo_price = promo_price
+                product.price = price
+                product.comment = comment
+                product.link = link
                 db.session.commit()
                 return jsonify([1, 'Изменения сохранены'])
         else:
-            new_author = Author(name=name, link=link,commission=commission,comment=comment, created_by=session['user']['id'], created_date=datetime.datetime.today())
-            db.session.add(new_author)
+            new_product = Product(author_id=author_id, name=name, link=link,promo_price=promo_price, price=price, comment=comment, created_by=session['user']['id'], created_date=datetime.datetime.today())
+            db.session.add(new_product)
             db.session.commit()
             return jsonify([1, 'Эксперт создан'])
 
@@ -1691,30 +1713,19 @@ def experts_table_handler():
     user_authors = db.session.query(Author).filter(Author.created_by == session['user']['id']).all()
     authors = []
     for author in user_authors:
-        authors.append([author.name,author.link,author.commission, author.comment, datetime.datetime.strftime(author.created_date, '%d-%m-%Y') , author.id])
+        print(author.link)
+        authors.append([author.name,author.link,len(author.products),author.commission, author.comment, datetime.datetime.strftime(author.created_date, '%d-%m-%Y') , author.id])
 
     return jsonify({"data": authors})
 
-@app.route('/admin/api/experts/list', methods=['POST'])
+@app.route('/admin/api/experts/list')
 @login_required
 def experts_list_handler():
     user_authors = db.session.query(Author).filter(Author.created_by == session['user']['id']).all()
     lst = []
     for author in user_authors:
         lst.append({'text': author.name, 'id':author.id})
-    a = {
-  "results": [
-    {
-      "id": 1,
-      "text": "Option 1"
-    },
-    {
-      "id": 2,
-      "text": "Option 2"
-    }
-  ]
-}
-    return jsonify(a)
+    return jsonify({'results':lst})
 
 @app.route('/admin/api/products/table', methods=['GET'])
 @login_required

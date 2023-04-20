@@ -7,45 +7,39 @@
                                                     </button>
                                                 </div>
                                                 <div class="modal-body">
-                                                    <form id="bloger-form">
+                                                    <form id="product-form">
                                                    <div class="mb-3">
                                             <label class="mb-1"><strong>Эксперт</strong></label>
-                                            <select id="expert-select" class="form-control">
-                                                <option value="AL">Alabama</option>
-                                                <option value="WY">Wyoming</option>
-                                            </select>
+                                            <select id="expert-select" name="product-expert" class="form-control form-validate"></select>
                                             <div class="invalid-feedback">Это поле обязательно для заполнения</div>
                                         </div>
-                                                          <div class="mb-3">
-                                            <label class="mb-1"><strong>Ссылка на профиль</strong></label>
-                                            <input type="text" name="expert-link" class="form-control" placeholder="https://">
-
+                                        <div class="mb-3">
+                                            <label class="mb-1">Название продукта</label>
+                                            <input type="text" id="product-name" name="product-name" class="form-control form-validate">
+                                            <div class="invalid-feedback">Это поле обязательно для заполнения</div>
                                         </div>
-
-                                               <div class="mb-3">
-                                                   <div>
-                                            <label class="mb-1"><strong>Продукт</strong></label>
-                                            <select class="default-select  form-control wide" style="display: none;">
-                                                <option>1</option>
-                                                <option>2</option>
-                                                <option>3</option>
-                                                <option>4</option>
-                                            </select>
-                                                       </div>
-                                             <div class="invalid-feedback">Это поле обязательно для заполенения</div>
-                                                 <a href="#" class="small p-2">+ Создать новый продукт</a>
-
+                                        <div class="mb-3">
+                                            <label class="mb-1">Ссылка на продукт (общая)</label>
+                                            <input type="text" id="product-link" name="product-link" class="form-control">
                                         </div>
-                                                    <div class="mb-3">
+                                        <div class="mb-3">
+                                            <label class="mb-1">Цена (базовая)</label>
+                                            <input type="number" id="product-price" name="product-price" class="form-control">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="mb-1">Цена со скидкой</label>
+                                            <input type="number"  id="product-promo-price"  name="product-promo-price" class="form-control">
+                                        </div>
+                                        <div class="mb-3">
                                             <label class="mb-1"><strong>Комментарий</strong></label>
-                                            <textarea id="comment-text" class="form-control" rows="5" style="height: auto;"></textarea>
+                                            <textarea name="product-comment" id="product-comment" class="form-control" rows="5" style="height: auto;"></textarea>
 
                                         </div>
                                         </form>
                                         </div>
                                                 <div class="modal-footer">
                                                     <button type="button" class="btn btn-danger light" data-bs-dismiss="modal">Закрыть</button>
-                                                    <a id="save-product" href="javascript:void(0);" class="btn btn-success"><i class="fa fa-plus me-2"></i>Добавить</a>
+                                                    <button id="save-product" class="btn btn-success"><i class="fa fa-plus me-2 product-save-icon"></i><span id="save-product-text">Добавить</span></button>
                                                 </div>
                                             </div>
                                         </div>

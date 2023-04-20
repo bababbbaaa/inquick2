@@ -64,7 +64,7 @@ class Config:
     MAIL_PASSWORD = 'zbcEEB4AhsnYJcasbqWY'  # '(YoRafKptO11'
     yt_api_key = 'AIzaSyAj5A9zXWxicj_BaZT1dV-tITdjgGQssZM'
     mrh_login = "inquick"
-    IS_TEST = 0
+    IS_TEST = 1
     if IS_TEST:
         merchant_login = mrh_login
         merchant_password1 = RoboTest.mrh_pass1

@@ -1,48 +1,49 @@
 
   var $uid = null;
-  $("#expert-select").select2({
-     ajax: {
-         url: 'https://api.github.com/search/repositories',
-         dataType: 'json'
 
 
-}
+  $('#expert-select').select2({
+  ajax: {
+    url: $getAuthorsEndpoint,
+    dataType: 'json'
+  }
 });
+
 
   $(document).on('click','#archive-product',function() {
     $uid = $(this).data('uid');
   });
     $(document).on('click','#edit-product',function() {
     $uid = $(this).data('uid');
-    $('#expertModal').modal('show');
-  });
-    $(document).on('click','#products-expert',function() {
-    $uid = $(this).data('uid');
-
+    $('#productModal').modal('show');
   });
 
 
-  $('#add-expert').click( function(event) {
+  $('#add-product').click( function(event) {
     $uid = null;
-    $('#expertModal').modal('show');
+    $('#productModal').modal('show');
   });
 
-  $('#save-expert').click( function(event) {
+  $('#save-product').click( function(event) {
+              $(this).addClass('btn-loading')
               event.preventDefault();
               $('#uid').val($uid);
-              params = $("#expert-form").serializeArray();
+              params = $("#product-form").serializeArray();
               if (validationForm()) {
-              $.post( $editExpertEndpoint, params )
+              $.post( $editProductEndpoint, params )
                               .done(function( data ) {
                               if (data[0] == 0) {
                                         ErrorMessageSend(data[1], 'Произошла ошибка')
+                                        $(this).removeClass('btn-loading')
                                         } else {
                                         SuccessMessageSend(data[1], 'Сохранено')
-                                        $('#expertModal').modal('hide');
+                                        $('#productModal').modal('hide');
                                         }
                                         });
 
                 //$('#callback-modal').modal('hide');
+              } else {
+              $('html,body').animate({scrollTop: $('.is-invalid').first().offset().top - 100});
               }
      });
 
@@ -60,34 +61,53 @@ function validationForm(form) {
         });
     return validated;
 }
-$('#expertModal').on('hide.bs.modal', function (e) {
-    $('#experts-table').DataTable().ajax.reload();
+$('#productModal').on('hide.bs.modal', function (e) {
+    $('#products-table').DataTable().ajax.reload();
 });
 
-$('#expertModal').on('show.bs.modal', function (e) {
+$('#productModal').on('show.bs.modal', function (e) {
+console.log($uid);
     if ($uid == null) {
-    $('#expert-form')[0].reset();
-    $('#save-expert-text').text('Добавить')
-    $('.expert-save-icon').addClass('fa-plus')
-    $('.expert-save-icon').removeClass('fa-save')
+    $('#product-form')[0].reset();
+    $('#expert-select').val(null).trigger("change");
+    $('#save-product-text').text('Добавить')
+    $('.product-save-icon').addClass('fa-plus')
+    $('.product-save-icon').removeClass('fa-save')
     } else {
-    $('#save-expert-text').text('Сохранить')
-    $('.expert-save-icon').removeClass('fa-plus')
-    $('.expert-save-icon').addClass('fa-save')
-   $.post( $getExpertEndpoint, {'uid': $uid} )
+    $('#save-product-text').text('Сохранить')
+    $('.product-save-icon').removeClass('fa-plus')
+    $('.product-save-icon').addClass('fa-save')
+   $.post( $getProductEndpoint, {'uid': $uid} )
                               .fail(function( data ) {
-
                                         ErrorMessageSend(data[1], 'Произошла ошибка')
-                                        $('#expert-form')[0].reset();
                             })
                               .done(function( data ) {
-                                        $('#expert-name').val(data['name']);
-                                        $('#expert-commission').val(data['commission']);
-                                        $('#expert-link').val(data['link']);
-                                        $('#expert-comment').val(data['comment']);
+                                        if ($('#expert-select').find("option[value='" + data['author']+ "']").length) {
+                                              $('#expert-select').val(data['author']).trigger('change');
+                                          } else {
+                                              // Create a DOM Option and pre-select by default
+                                              var newOption = new Option(data['author_name'], data['author'], true, true);
+                                              // Append it to the select
+                                              $('#expert-select').append(newOption).trigger('change').select2();
+                                          }
+
+                                        $('#product-name').val(data['name']);
+                                        $('#product-promo-price').val(data['promo_price']);
+                                        $('#product-price').val(data['price']);
+                                        $('#product-link').val(data['link']);
+                                        $('#product-comment').val(data['comment']);
                                         });
                                         }
 
 });
 
 
+	    $('#products-table').on('click', 'tr', function () {
+	    console.log('test');
+        if ($(this).hasClass('selected')) {
+            $(this).removeClass('selected');
+        } else {
+            $('tr.selected').removeClass('selected');
+            $(this).addClass('selected');
+        }
+    });

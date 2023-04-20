@@ -4,7 +4,6 @@
   $('#submit-btn').click(function(event) {
       event.preventDefault();
       params = $("#form").serializeArray();
-
       if (validationLoginForm()) {
         LoginFormProceed(params);
       }
@@ -12,10 +11,7 @@
 
 $(".form-control").on('keydown', function(e) {
 if( (event.keyCode == 13) ) {
-params = $("#form").serializeArray();
-if (validationLoginForm()) {
-   LoginFormProceed(params);
-   }
+$('#submit-btn').click()
         }
      });
 
@@ -23,17 +19,20 @@ if (validationLoginForm()) {
 
 
 function LoginFormProceed(params) {
+    $('#submit-btn').attr('disabled', true);
     $.post( '', params )
       .fail(function(){
             $('#fail-msg').text('Что-то пошло не так... Попробуйте позднее');
             $('.success-message').hide();
             $('.fail-message').show();
+            $('#submit-btn').removeAttr('disabled');
         })
       .done(function( data ) {
       if (data[0] == 0) {
                     $('#fail-msg').text(data[1]);
                     $('.fail-message').show();
                     $('.success-message').hide();
+                    $('#submit-btn').removeAttr('disabled');
                     }
       if (data[0]==1) {
                     $('#success-msg').text(data[1]);

@@ -67,7 +67,6 @@ $('#expertModal').on('show.bs.modal', function (e) {
                               .fail(function( data ) {
 
                                         ErrorMessageSend(data[1], 'Произошла ошибка')
-                                        $('#expert-form')[0].reset();
                             })
                               .done(function( data ) {
                                         $('#expert-name').val(data['name']);
