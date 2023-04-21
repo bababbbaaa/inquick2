@@ -1,8 +1,17 @@
-    $('#products-select').select2({
+
+$('#products-select').select2({
      ajax: {
     url: $getProductsEndpoint,
     dataType: 'json'
-  }});
+}});
+$('#products-select').on("change", function(){
+  data=$("#products-select").select2('data')[0];
+    if ($(this).select2('data').length) {
+     $('#bloger-commission').val($(this).select2('data')[0].commission);
+     $('#bloger-commission2').val($(this).select2('data')[0].commission_2);
+    }
+
+});
     $(".notify-dialog").hide();
     $(".agree-dialog").hide();
     $(".cancel-dialog").hide();

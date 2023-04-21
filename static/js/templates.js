@@ -33,7 +33,7 @@ $('#expert-select').on("change", function(){
     $('#productModal').modal('show');
   });
 
-  $('#save-product').click( function(event) {
+  $('#save-template').click( function(event) {
               $(this).addClass('btn-loading')
               event.preventDefault();
               $('#uid').val($uid);

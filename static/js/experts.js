@@ -72,6 +72,7 @@ $('#expertModal').on('show.bs.modal', function (e) {
                                         $('#expert-name').val(data['name']);
                                         $('#expert-commission').val(data['commission']);
                                         $('#expert-link').val(data['link']);
+                                        $('#expert-commission2').val(data['commission_2']);
                                         $('#expert-comment').val(data['comment']);
                                         });
                                         }

@@ -4,7 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 db = SQLAlchemy()
 
 users_products_association = db.Table('users_products',
-    db.Column('user_id', db.Integer, db.ForeignKey('users.id')),
+    db.Column('bloger_id', db.Integer, db.ForeignKey('blogers.id')),
     db.Column('product_id', db.Integer, db.ForeignKey('products.id'))
 )
 
@@ -31,6 +31,7 @@ class User(db.Model):
     registration_code = db.Column(db.String)
     notifications = db.relationship('Notification', back_populates='user')
     products = db.relationship('Product', back_populates='user')
+    templates = db.relationship('Template', back_populates='user')
     license_agreement = db.Column(db.Boolean)
     controled_users = db.relationship('User', backref=db.backref('parent', remote_side=[id]), lazy = True)
     name = db.Column(db.String)
@@ -105,10 +106,10 @@ class Bloger(db.Model):
     name = db.Column(db.String)
     link = db.Column(db.String)
     created_by = db.Column(db.Integer)
-    products = db.relationship('Product', back_populates='blogers')
     commission = db.Column(db.Integer)
     created_date = db.Column(db.DateTime)
     comment = db.Column(db.String)
+    products = db.relationship('Product', secondary=users_products_association, back_populates='blogers')
 
 class Product(db.Model):
     __tablename__ = 'products'
@@ -121,8 +122,7 @@ class Product(db.Model):
     orders = db.relationship("Order")
     conversions = db.Column(db.Integer)
     archived = db.Column(db.Boolean)
-    bloger = db.relationship("Bloger")
-    bloger_id = db.Column(db.Integer, db.ForeignKey("blogers.id"))
+    blogers = db.relationship('Bloger', secondary=users_products_association, back_populates='products')
     author = db.relationship("Author")
     author_id = db.Column(db.Integer, db.ForeignKey("authors.id"))
     user = db.relationship("User")
@@ -132,7 +132,7 @@ class Product(db.Model):
     real_product_id = db.Column(db.Integer, db.ForeignKey('products.id'))
     created_date = db.Column(db.DateTime)
     comment = db.Column(db.String)
-    commission_1 =db.Column(db.Integer)
+    commission = db.Column(db.Integer)
     commission_2 = db.Column(db.Integer)
 
 
@@ -151,6 +151,15 @@ class Attachment(db.Model):
     type = db.Column(db.String)
     content = db.Column(db.String)
     description = db.Column(db.String)
+
+
+class Template(db.Model):
+    __tablename__ = 'templates'
+    id = db.Column(db.Integer, primary_key=True)
+    user = db.relationship("User")
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+    title = db.Column(db.String)
+    content = db.Column(db.String)
 
 
 class Order(db.Model):

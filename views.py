@@ -55,13 +55,12 @@ def login_required(f):
     def decorated_function(*args, **kwargs):
         if not session.get('user'):
             return redirect (url_for('login_view'))
-        if not session['user'].get('confirmed'): session['user']['confirmed'] = False
         if not session['user']['confirmed'] and request.method != 'POST':
             user = db.session.query(User).get(session['user']['id'])
             if not user:
                 session.pop('user')
                 return redirect(url_for('login_view'))
-            return render_template('additional/confirm.html', extensions=['confirm'])
+            return render_template('additional/confirm.html', email =session['user']['email'] ,extensions=['confirm'])
         return f(*args, **kwargs)
     return decorated_function
 
@@ -1261,97 +1260,6 @@ def edit_product(product_id, command):
         return render_template('product_access.html', user=user, product=product, roles=roles, product_ids=product_ids, reps=reps)
     return redirect(url_for('product'))
 
-@app.route('/private/files/delete_image')
-def delete_image():
-    product_id = request.args.get('product_id')
-    image = request.args.get('image')
-
-    if not image:
-        return redirect(url_for('edit_product', product_id=product_id, command='edit'))
-    if not product_id:
-        return redirect(url_for('product'))
-    product = Product.query.get(int(product_id))
-    if product:
-        try:
-            file = os.path.join(os.path.join(app.config['UPLOAD_FOLDER'], str('landing' + str(product.id)), image))
-            os.remove(file)
-        except Exception as e:
-            print(e)
-        if product.main_img == image: product.main_img=None
-        if product.author_avatar == image: product.author_avatar=None
-        db.session.commit()
-        session["msg"] = messages.get('delete_image_success')
-        return redirect(url_for('edit_product', product_id=product_id, command='edit'))
-
-
-
-@app.route('/content/<landing_folder>/<filename>')
-def uploaded_file(landing_folder, filename):
-
-    product = Product.query.filter_by(link=landing_folder).first()
-    link = str('landing' + str(product.id))
-    return send_from_directory(os.path.join(app.config['UPLOAD_FOLDER'], link),
-                               filename)
-
-@app.route('/private/referal/<int:product_id>/<int:user_id>/<command>')
-@login_required
-@check_permission
-def control_access(product_id,user_id,command):
-    user = db.session.query(User).get(session['user']['id'])
-    product = Product.query.filter_by(id=product_id).first()
-    referal = User.query.filter_by(id=user_id).first()
-    if product not in user.products:
-        session["msg"] = 'У вас нет прав доступа для изменения настроек данного продукта'
-        session["msg_cat"] = 'danger'
-        return redirect(url_for('referal'))
-    msg=''
-    if command == 'allow':
-        product.users.append(referal)
-        msg= messages.get('allow_product')
-        session["msg"] = msg.format(referal.username if referal.username else 'Без имени', referal.promocode, product.name)
-
-    if command == 'deny':
-        product.users.remove(referal)
-        msg = messages.get('deny_product')
-        session["msg"] = msg.format(referal.username if referal.username else 'Без имени', referal.promocode, product.name)
-    db.session.commit()
-    product = Product.query.filter_by(id=product_id).first()
-    msg = session.pop("msg") if session.get("msg") else ''
-    msg_cat = session.pop("msg_cat") if session.get("msg_cat") else 'success'
-    return render_template('product_access.html', user=user, product=product, roles=roles, msg=msg, msg_cat=msg_cat)
-
-@app.route('/private/product')
-@app.route('/private/product/')
-@login_required
-@check_permission
-@license_agreement
-def product():
-    products = []
-    archived = []
-    user = db.session.query(User).get(session['user']['id'])
-    if user.role == 0:
-        products = Product.query.filter_by(archived=False).all()
-        archived = Product.query.filter_by(archived=True).all()
-    else:
-        if user.products:
-            archived = Product.query.filter(db.or_(Product.id==product.id for product in user.products), Product.archived==True).all()
-            products = Product.query.filter(db.or_(Product.id==product.id for product in user.products), Product.archived==False).all()
-    msg = session.pop("msg") if session.get("msg") else ''
-    msg_cat = session.pop("msg_cat") if session.get("msg_cat") else 'success'
-    return render_template('product.html', products=products, archived=archived, msg=msg, msg_cat=msg_cat, user=user, roles=roles)
-
-
-@app.route('/private/license', methods=["GET", "POST"])
-@login_required
-def license():
-    user = db.session.query(User).get(session['user']['id'])
-    if user.license_agreement: return redirect(url_for('product'))
-    if request.method == 'POST':
-        user.license_agreement = True
-        db.session.commit()
-        return redirect(url_for('product'))
-
-    return render_template('license.html', user=user, roles=roles)
 
 
 @app.route('/login', methods=["GET", "POST"])
@@ -1422,7 +1330,7 @@ def signup_view():
             new_user = User(email=email.lower(), password=password, name=name, email_confirmed=False, registration_date=datetime.datetime.now(), role=0, confirmation_mail_sent_time=datetime.datetime.now())
             db.session.add(new_user)
             db.session.commit()
-            session['user'] = {'id': new_user.id, 'email': new_user.email,'name': new_user.name}
+            session['user'] = {'id': new_user.id, 'email': new_user.email,'name': new_user.name, 'confirmed': False}
             token = generate_confirmation_token(new_user.email)
             template = render_template('emails/email-confirm.html', email=new_user.email, token=token)
             send_mail(email=new_user.email, template=template, subject='Подтверждение электронной почты')
@@ -1450,137 +1358,11 @@ def resend_confirm_mail():
         now = datetime.datetime.now()
         if user.confirmation_mail_sent_time + datetime.timedelta(minutes=5) > now:
             return jsonify([0, 'Письмо уже отправлено. Повторите попытку позже'])
-        #resend_confirmation_letter(user.email)
+        resend_confirmation_letter(user.email)
         user.confirmation_mail_sent_time = now
         db.session.commit()
         return jsonify([1, 'Письмо отправлено'])
     return abort(404)
-
-@app.route('/private/product/add', methods=["GET", "POST"])
-@login_required
-def add_product():
-    user = db.session.query(User).get(session['user']['id'])
-    if user.role > 2: return redirect(url_for('dashboard'))
-    form = AddProductForm()
-    if request.method == 'POST' and form.validate_on_submit():
-        exist_products = db.session.query(Product).filter(Product.author_id==user.id)
-        for elem in exist_products:
-            product_name = elem.name
-            new_product_name = form.name.data
-            if product_name.lower() == new_product_name.lower():
-                form.name.errors.append("Продукт с таким именем уже существует!")
-                return render_template('add_product.html', form=form, user=user, roles=roles)
-        link = form.link.data
-        link = link.lower()
-        exist_links = Product.query.filter_by(link=link).first()
-
-        if link in stop_list:
-            form.link.errors.append("Недопустимое имя для продукта")
-            return render_template('add_product.html', form=form, user=user, roles=roles)
-        if exist_links:
-            form.link.errors.append("Адрес уже используется")
-            return render_template('add_product.html', form=form, user=user, roles=roles)
-
-        new_product = Product(link=link, archived=False, moderated=False,  author_id=user.id, name=form.name.data, conversions=0, price=0, promo_price=0, content_info=form.content_type.data)
-        Telegram.send_message('Создан новый продукт.\nАвтор {}\nНазвание {}'.format(user.username, form.name.data))
-        #---------------------------Загрузка изображений---------------------------------
-
-
-        #------------------------------------------------------------
-        db.session.add(new_product)
-        #Добавлена строка, потому что если админ или супер создают продукт и назначают автора - теряют доступ
-        new_product.users.append(user)
-        if user.role != 0: new_product.users.append(User.query.get(1))
-        if user.role >= 2:
-            #allowed_users_rows = user.controled_users()
-            # Если это автор - то мы включим супервайзера в список разрешенных
-            parent = User.query.filter_by(id=user.refferer_id).first()
-            if parent: new_product.users.append(parent)
-            # --------------------------------------
-            # Включить авто доступ ко всем продуктам
-            # for child in user.controled_users:
-            #     new_product.users.append(child)
-            # --------------------------------------
-            #for row in allowed_users_rows:
-           #     allowed_user = User.query.filter_by(id=row.id).first()
-           #     new_product.users.append(allowed_user)
-        db.session.commit()
-        msg = messages.get('save_product_success')
-        session["msg"] = msg.format(form.name.data)
-
-        return redirect(url_for('edit_product', command='edit', product_id=new_product.id))
-    else:
-        return render_template('add_product.html', form=form, roles=roles, user=user)
-
-
-@app.route('/private/attachment/<command>/<int:attachment_id>/', methods=["GET", "POST"])
-@login_required
-def edit_attachment(attachment_id, command):
-    user = db.session.query(User).get(session['user']['id'])
-    if user.role > 2: return redirect(url_for('dashboard'))
-    attachment = db.session.query(Attachment).get(attachment_id)
-    product = attachment.product
-
-    if command == 'delete':
-        try:
-            file = os.path.join(app.config['UPLOAD_FOLDER'], str(attachment.product_id), attachment.content)
-            os.remove(file)
-        except Exception as e:
-            print(e)
-        db.session.delete(attachment)
-        db.session.commit()
-        msg = messages.get('delete_attachment_success')
-        session["msg"] = msg.format(product.name)
-
-    if command == 'edit':
-        if attachment.type == 'file':
-            form = FileForm()
-        else:
-            form = LinkForm()
-        if request.method == 'GET':
-            form.content.data = attachment.content
-            form.description.data = attachment.description
-            return render_template('add_attachment.html', form=form, type=attachment.type, attachment=attachment, roles=roles, user=user)
-
-        if request.method == 'POST':
-            if attachment.type == 'link' and form.validate_on_submit():
-                hearders = {'headers':'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:51.0) Gecko/20100101 Firefox/51.0'}
-                link = form.content.data
-                link = formaturl(link)
-                title = None
-                try:
-                        n = requests.get(link, headers=hearders)
-                except:
-                        form.content.errors.append("Проверьте правильность ссылки, не удается получить контент")
-                        return render_template('add_attachment.html', form=form, type=attachment.type, attachment=attachment, roles=roles, user=user)
-                if n.status_code != 200:
-                        form.content.errors.append("Проверьте правильность ссылки, не удается получить контент")
-                        return render_template('add_attachment.html', form=form, type=attachment.type, attachment=attachment, user=user, roles=roles)
-                if not form.description.data:
-                    content_type = n.headers['Content-Type']
-                    if 'text/html' in content_type:
-                        n.encoding = 'utf-8'
-                        al = n.text
-                        title = al[al.find('<title>') + 7 : al.find('</title>')]
-
-                else:
-                    title = form.description.data
-                attachment.content = link
-                attachment.description = title
-
-            if attachment.type == 'file':
-                attachment.description = form.description.data
-
-            db.session.commit()
-
-            msg = messages.get('edit_attachment')
-            session["msg"] = msg.format(product.name)
-        else:
-            return render_template('add_attachment.html', form=form, type=attachment.type, attachment=attachment, user=user, roles=roles)
-
-    return redirect(url_for('product'))
-
-
 
 
 @app.errorhandler(404)
@@ -1624,9 +1406,9 @@ def get_expert_handler():
     author = db.session.query(Author).get(uid)
     if author:
         if author.created_by == session['user']['id']:
-            return jsonify({'name':author.name, 'commission': author.commission, 'link': author.link, 'comment': author.comment})
+            return jsonify({'name':author.name, 'commission': author.commission,'commission_2': author.commission_2 , 'link': author.link, 'comment': author.comment})
 
-    return jsonify({'name': '', 'commission': '', 'link': '', 'comment': ''})
+    return jsonify({'name': '', 'commission': '', 'link': '', 'comment': '', 'commission_2':''})
 
 @app.route('/api/product/get', methods=['POST'])
 @login_required
@@ -1636,9 +1418,9 @@ def get_product_handler():
     product = db.session.query(Product).get(uid)
     if product:
         if product.created_by == session['user']['id']:
-            return jsonify({'author':product.author_id,'author_name':product.author.name, 'name':product.name, 'price': product.price, 'promo_price': product.promo_price, 'link': product.link, 'comment': product.comment})
+            return jsonify({'author':product.author_id,'author_name':product.author.name, 'name':product.name, 'price': product.price, 'promo_price': product.promo_price, 'link': product.link, 'comment': product.comment,'commission': product.commission,'commission_2': product.commission_2 , })
 
-    return jsonify({'author': '', 'author_name': '', 'name': '', 'promo-price': '', 'price': '', 'link': '', 'comment': ''})
+    return jsonify({'author': '', 'author_name': '', 'name': '', 'promo-price': '', 'price': '', 'link': '', 'comment': '', 'commission': '', 'commission_2':''})
 
 @app.route('/api/product/edit', methods=['POST'])
 def edit_product_handler():
@@ -1651,6 +1433,8 @@ def edit_product_handler():
         promo_price = request.form.get('product-promo-price', type=int)
         price = request.form.get('product-price', type=int)
         comment = request.form.get('product-comment', '')
+        commission = request.form.get('product-commission', '')
+        commission2 = request.form.get('product-commission2', '')
         author_id = request.form.get('product-expert')
         uid = request.form.get('uid', type=int)
         if uid:
@@ -1661,12 +1445,14 @@ def edit_product_handler():
                 product.name = name
                 product.promo_price = promo_price
                 product.price = price
+                product.commission = commission
+                product.commission_2 = commission2
                 product.comment = comment
                 product.link = link
                 db.session.commit()
                 return jsonify([1, 'Изменения сохранены'])
         else:
-            new_product = Product(author_id=author_id, name=name, link=link,promo_price=promo_price, price=price, comment=comment, created_by=session['user']['id'], created_date=datetime.datetime.today())
+            new_product = Product(author_id=author_id, name=name, link=link,promo_price=promo_price, price=price, comment=comment, created_by=session['user']['id'], created_date=datetime.datetime.today(), commission=commission, commission_2=commission2)
             db.session.add(new_product)
             db.session.commit()
             return jsonify([1, 'Эксперт создан'])
@@ -1683,6 +1469,7 @@ def edit_expert_handler():
         link = request.form.get('expert-link')
         link = formaturl(link)
         commission = request.form.get('expert-commission')
+        commission2 = request.form.get('expert-commission2')
         comment = request.form.get('expert-comment')
         uid = request.form.get('uid', type=int)
         if uid:
@@ -1692,12 +1479,13 @@ def edit_expert_handler():
             else:
                 author.name = name
                 author.commission = commission
+                author.commission_2 = commission2
                 author.comment = comment
                 author.link = link
                 db.session.commit()
                 return jsonify([1, 'Изменения сохранены'])
         else:
-            new_author = Author(name=name, link=link,commission=commission,comment=comment, created_by=session['user']['id'], created_date=datetime.datetime.today())
+            new_author = Author(name=name, link=link,commission=commission, commission_2=commission2,comment=comment, created_by=session['user']['id'], created_date=datetime.datetime.today())
             db.session.add(new_author)
             db.session.commit()
             return jsonify([1, 'Эксперт создан'])
@@ -1713,8 +1501,7 @@ def experts_table_handler():
     user_authors = db.session.query(Author).filter(Author.created_by == session['user']['id']).all()
     authors = []
     for author in user_authors:
-        print(author.link)
-        authors.append([author.name,author.link,len(author.products),author.commission, author.comment, datetime.datetime.strftime(author.created_date, '%d-%m-%Y') , author.id])
+        authors.append([author.name,author.link,len(author.products),author.commission, author.commission_2,author.comment, datetime.datetime.strftime(author.created_date, '%d-%m-%Y') , author.id])
 
     return jsonify({"data": authors})
 
@@ -1724,7 +1511,7 @@ def experts_list_handler():
     user_authors = db.session.query(Author).filter(Author.created_by == session['user']['id']).all()
     lst = []
     for author in user_authors:
-        lst.append({'text': author.name, 'id':author.id})
+        lst.append({'text': author.name, 'id':author.id, 'commission': author.commission, 'commission_2': author.commission_2})
     return jsonify({'results':lst})
 
 @app.route('/api/products/list')
@@ -1733,7 +1520,7 @@ def products_list_handler():
     products = db.session.query(Product).filter(Product.created_by == session['user']['id']).all()
     lst = []
     for product in products:
-        lst.append({'text': f'{product.name} ({product.author.name})' , 'id':product.id})
+        lst.append({'text': f'{product.name} ({product.author.name})' , 'id':product.id, 'commission':product.commission, 'commission_2':product.commission_2})
     return jsonify({'results':lst})
 
 
@@ -1745,7 +1532,7 @@ def products_table_handler():
     products = db.session.query(Product).filter(Product.created_by == session['user']['id']).all()
     products_out = []
     for product in products:
-        products_out.append([product.name,product.link,product.author.name,f'{product.price}р./{product.promo_price}р.', product.comment, datetime.datetime.strftime(product.created_date, '%d-%m-%Y') , product.id])
+        products_out.append([product.name,product.link,product.author.name,f'{product.price}р./{product.promo_price}р.', product.commission, product.commission_2 ,product.comment, datetime.datetime.strftime(product.created_date, '%d-%m-%Y') , product.id])
 
     return jsonify({"data": products_out})
 

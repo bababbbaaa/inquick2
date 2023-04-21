@@ -64,6 +64,9 @@
 	{% if 'experts' in extensions %}
 		<script src="{{url_for('static', filename='js/experts.js')}}"></script>
 	{% endif %}
+	{% if 'templates' in extensions %}
+		<script src="{{url_for('static', filename='js/templates.js')}}"></script>
+	{% endif %}
 	{% if 'products' in extensions %}
 		<script src="{{url_for('static', filename='js/products.js')}}"></script>
 	{% endif %}

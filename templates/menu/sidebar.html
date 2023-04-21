@@ -32,20 +32,23 @@
                         <span class="nav-text">Рабочий кабинет</span>
                         </a>
                     </li>
-                      <li><a href="{{url_for('templates_view')}}" class="ai-icon" aria-expanded="false">
-                        <i class="fa fa-pencil-square"></i>
-                        <span class="nav-text">Шаблоны</span>
-                        </a>
+                    <li><a class="has-arrow ai-icon" href="javascript:void()" aria-expanded="false">
+							<i class="fa fa-th-list"></i>
+							<span class="nav-text">Планировщик</span>
+						</a>
+                        <ul aria-expanded="false" class="mm-collapse">
+                            <li><a href="{{url_for('planner_view')}}">Согласование</a></li>
+                            <li><a href="{{url_for('planner_view')}}">Рекламные кампании</a></li>
+                        </ul>
                     </li>
-
-                     <li><a href="{{url_for('calendar_view')}}" class="ai-icon" aria-expanded="false">
+                    <li><a href="{{url_for('calendar_view')}}" class="ai-icon" aria-expanded="false">
                         <i class="fa fa-calendar"></i>
                         <span class="nav-text">Календарь</span>
                         </a>
                     </li>
-                     <li><a href="{{url_for('planner_view')}}" class="ai-icon" aria-expanded="false">
-                        <i class="fa fa-th-list"></i>
-                        <span class="nav-text">Планировщик</span>
+                      <li><a href="{{url_for('templates_view')}}" class="ai-icon" aria-expanded="false">
+                        <i class="fa fa-pencil-square"></i>
+                        <span class="nav-text">Шаблоны</span>
                         </a>
                     </li>
                     <li><a href="widget-basic.html" class="ai-icon" aria-expanded="false">
@@ -53,23 +56,14 @@
                         <span class="nav-text">Блогеры</span>
                         </a>
                     </li>
-                    <li><a href="{{url_for('products_view')}}" class="ai-icon" aria-expanded="false">
-                        <i class="flaticon-381-reading"></i>
-                        <span class="nav-text">Продукты</span>
-                        </a>
-                    </li>
-                    <li><a class="has-arrow ai-icon" href="javascript:void()" aria-expanded="false">
-							<i class="fa fa-th-list"></i>
-							<span class="nav-text">Планировщик</span>
-						</a>
-                        <ul aria-expanded="false" class="mm-collapse">
-                            <li><a href="./chart-flot.html">Согласование</a></li>
-                            <li><a href="./chart-morris.html">Рекламные кампании</a></li>
-                        </ul>
-                    </li>
                     <li><a href="{{url_for('experts_view')}}" class="ai-icon" aria-expanded="false">
                         <i class="flaticon-013-checkmark"></i>
                         <span class="nav-text">Эксперты</span>
+                        </a>
+                    </li>
+                    <li><a href="{{url_for('products_view')}}" class="ai-icon" aria-expanded="false">
+                        <i class="flaticon-381-reading"></i>
+                        <span class="nav-text">Продукты</span>
                         </a>
                     </li>
                     <li><a href="widget-basic.html" class="ai-icon" aria-expanded="false">
